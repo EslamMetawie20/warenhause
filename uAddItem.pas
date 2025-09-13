@@ -37,16 +37,32 @@ var
 
 implementation
 
-uses uDatabase, uArabicTexts;
+uses uDatabase;
 
 {$R *.dfm}
 
 procedure TfrmAddItem.FormCreate(Sender: TObject);
 begin
-  // إعدادات النموذج للغة العربية
+  // إعدادات النموذج
   BiDiMode := bdRightToLeft;
   Position := poMainFormCenter;
   BorderStyle := bsDialog;
+
+  // إعدادات الخط لدعم العربية
+  Font.Name := 'Segoe UI';
+  Font.Charset := ARABIC_CHARSET;
+
+  // تعيين النصوص بالعربية هنا بدل الـ DFM
+  Caption             := 'إضافة قطعة جديدة';
+  lblItemID.Caption   := 'رقم القطعة:';
+  lblItemName.Caption := 'اسم القطعة:';
+  lblQuantity.Caption := 'الكمية:';
+  lblPrice.Caption    := 'السعر:';
+  lblLocation.Caption := 'مكان التخزين:';
+  btnSave.Caption     := 'حفظ';
+  btnCancel.Caption   := 'إلغاء';
+
+  edtLocation.Text    := 'المخزن / الرف / الدرج';
 end;
 
 procedure TfrmAddItem.btnSaveClick(Sender: TObject);
@@ -54,7 +70,6 @@ var
   Qty: Integer;
   Price: Currency;
 begin
-  // التحقق من البيانات
   if Trim(edtItemID.Text) = '' then
   begin
     MessageDlg('من فضلك أدخل رقم القطعة', mtWarning, [mbOK], 0);
@@ -90,7 +105,6 @@ begin
     Exit;
   end;
 
-  // حفظ البيانات
   if DBManager.AddNewItem(edtItemID.Text, edtItemName.Text, edtLocation.Text, Qty, Price) then
   begin
     MessageDlg('تم حفظ القطعة بنجاح', mtInformation, [mbOK], 0);
@@ -110,14 +124,12 @@ end;
 
 procedure TfrmAddItem.edtQuantityKeyPress(Sender: TObject; var Key: Char);
 begin
-  // السماح بالأرقام فقط
   if not CharInSet(Key, ['0'..'9', #8]) then
     Key := #0;
 end;
 
 procedure TfrmAddItem.edtPriceKeyPress(Sender: TObject; var Key: Char);
 begin
-  // السماح بالأرقام والنقطة العشرية
   if not CharInSet(Key, ['0'..'9', '.', #8]) then
     Key := #0;
 end;

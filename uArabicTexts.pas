@@ -61,6 +61,8 @@ begin
     Result := 'رقم القطعة'
   else if Key = 'COL_ITEM_NAME' then
     Result := 'اسم القطعة'
+      else if Key = 'MENU_ADD_ITEM' then
+    Result := 'إضافة قطعة جديدة'
   else if Key = 'COL_QUANTITY' then
     Result := 'الكمية المتاحة'
   else if Key = 'COL_LOCATION' then

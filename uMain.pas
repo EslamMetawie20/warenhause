@@ -44,6 +44,8 @@ type
     FLastWithdrawDetails: string;
     procedure UpdateStatus(const Msg: string);
     procedure LoadAllItems;
+    function ShowArabicMessage(const AText, ACaption: string;
+      DlgType: TMsgDlgType; Buttons: TMsgDlgButtons): Integer;
   public
     { Public declarations }
   end;
@@ -64,6 +66,13 @@ begin
   Caption := GetArabicText('FORM_MAIN');
   Position := poScreenCenter;
   WindowState := wsMaximized;
+
+  // تعيين القوائم بالنصوص العربية
+  mnuFile.Caption := GetArabicText('MENU_FILE');
+  mnuAddItem.Caption := GetArabicText('MENU_ADD_ITEM');
+  mnuExit.Caption := GetArabicText('MENU_EXIT');
+  mnuHelp.Caption := GetArabicText('MENU_HELP');
+  mnuAbout.Caption := GetArabicText('MENU_ABOUT');
 
   // اللوحة العلوية
   pnlTop.Align := alTop;
@@ -152,7 +161,8 @@ var
 begin
   if Trim(edtSearchID.Text) = '' then
   begin
-    MessageDlg(GetArabicText('MSG_ENTER_ITEM_ID'), mtWarning, [mbOK], 0);
+    ShowArabicMessage(GetArabicText('MSG_ENTER_ITEM_ID'), 
+      GetArabicText('SYSTEM_TITLE'), mtWarning, [mbOK]);
     edtSearchID.SetFocus;
     Exit;
   end;
@@ -176,7 +186,8 @@ begin
   else
   begin
     UpdateStatus(GetArabicText('MSG_ITEM_NOT_FOUND'));
-    MessageDlg(GetArabicText('MSG_ITEM_NOT_FOUND'), mtInformation, [mbOK], 0);
+    ShowArabicMessage(GetArabicText('MSG_ITEM_NOT_FOUND'), 
+      GetArabicText('SYSTEM_TITLE'), mtInformation, [mbOK]);
   end;
 end;
 
@@ -198,13 +209,15 @@ var
 begin
   if FCurrentItemID = '' then
   begin
-    MessageDlg(GetArabicText('MSG_SEARCH_FIRST'), mtWarning, [mbOK], 0);
+    ShowArabicMessage(GetArabicText('MSG_SEARCH_FIRST'), 
+      GetArabicText('SYSTEM_TITLE'), mtWarning, [mbOK]);
     Exit;
   end;
 
   if not TryStrToInt(edtWithdrawQty.Text, Qty) or (Qty <= 0) then
   begin
-    MessageDlg(GetArabicText('MSG_ENTER_VALID_QTY'), mtWarning, [mbOK], 0);
+    ShowArabicMessage(GetArabicText('MSG_ENTER_VALID_QTY'), 
+      GetArabicText('SYSTEM_TITLE'), mtWarning, [mbOK]);
     edtWithdrawQty.SetFocus;
     Exit;
   end;
@@ -213,8 +226,8 @@ begin
   begin
     if Qty > AvailableQty then
     begin
-      MessageDlg(Format(GetArabicText('MSG_QTY_MORE_THAN_AVAIL') + ' (%d > %d)',
-        [Qty, AvailableQty]), mtWarning, [mbOK], 0);
+      ShowArabicMessage(Format(GetArabicText('MSG_QTY_MORE_THAN_AVAIL') + ' (%d > %d)',
+        [Qty, AvailableQty]), GetArabicText('SYSTEM_TITLE'), mtWarning, [mbOK]);
       Exit;
     end;
 
@@ -232,7 +245,8 @@ begin
       );
 
       UpdateStatus(GetArabicText('MSG_ITEMS_WITHDRAWN'));
-      MessageDlg(GetArabicText('MSG_WITHDRAW_SUCCESS'), mtInformation, [mbOK], 0);
+      ShowArabicMessage(GetArabicText('MSG_WITHDRAW_SUCCESS'), 
+        GetArabicText('SYSTEM_TITLE'), mtInformation, [mbOK]);
       btnPrintReceipt.Enabled := True;
 
       // تحديث الشبكة
@@ -241,7 +255,8 @@ begin
     end
     else
     begin
-      MessageDlg(GetArabicText('MSG_WITHDRAW_FAILED'), mtError, [mbOK], 0);
+      ShowArabicMessage(GetArabicText('MSG_WITHDRAW_FAILED'), 
+        GetArabicText('SYSTEM_TITLE'), mtError, [mbOK]);
     end;
   end;
 end;
@@ -270,13 +285,14 @@ end;
 
 procedure TfrmMain.mnuAboutClick(Sender: TObject);
 begin
-  MessageDlg(GetArabicText('ABOUT_TEXT'), mtInformation, [mbOK], 0);
+  ShowArabicMessage(GetArabicText('ABOUT_TEXT'), 
+    GetArabicText('SYSTEM_TITLE'), mtInformation, [mbOK]);
 end;
 
 procedure TfrmMain.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
-  if MessageDlg(GetArabicText('MSG_EXIT_CONFIRM'),
-    mtConfirmation, [mbYes, mbNo], 0) = mrYes then
+  if ShowArabicMessage(GetArabicText('MSG_EXIT_CONFIRM'),
+    GetArabicText('SYSTEM_TITLE'), mtConfirmation, [mbYes, mbNo]) = mrYes then
   begin
     Action := caFree;
     Application.Terminate;
@@ -288,6 +304,103 @@ end;
 procedure TfrmMain.UpdateStatus(const Msg: string);
 begin
   StatusBar1.SimpleText := '  ' + Msg;
+end;
+
+function TfrmMain.ShowArabicMessage(const AText, ACaption: string;
+  DlgType: TMsgDlgType; Buttons: TMsgDlgButtons): Integer;
+var
+  MsgForm: TForm;
+  MsgLabel: TLabel;
+  ButtonPanel: TPanel;
+  OKButton, YesButton, NoButton, CancelButton: TButton;
+  // IconImage: TImage;
+  ButtonWidth, ButtonLeft: Integer;
+begin
+  MsgForm := TForm.Create(nil);
+  try
+    MsgForm.Caption := ACaption;
+    MsgForm.BiDiMode := bdRightToLeft;
+    MsgForm.Position := poScreenCenter;
+    MsgForm.BorderStyle := bsDialog;
+    MsgForm.Width := 400;
+    MsgForm.Height := 200;
+    
+    // إنشاء التسمية للنص
+    MsgLabel := TLabel.Create(MsgForm);
+    MsgLabel.Parent := MsgForm;
+    MsgLabel.Caption := AText;
+    MsgLabel.BiDiMode := bdRightToLeft;
+    MsgLabel.Font.Name := 'Arial';
+    MsgLabel.Font.Size := 11;
+    MsgLabel.WordWrap := True;
+    MsgLabel.Left := 20;
+    MsgLabel.Top := 40;
+    MsgLabel.Width := 340;
+    MsgLabel.Height := 60;
+    MsgLabel.Alignment := taRightJustify;
+    
+    // لوحة الأزرار
+    ButtonPanel := TPanel.Create(MsgForm);
+    ButtonPanel.Parent := MsgForm;
+    ButtonPanel.Align := alBottom;
+    ButtonPanel.Height := 50;
+    ButtonPanel.BevelOuter := bvNone;
+    
+    ButtonWidth := 75;
+    ButtonLeft := MsgForm.Width - 100;
+    
+    // إنشاء الأزرار حسب الحاجة
+    if mbOK in Buttons then
+    begin
+      OKButton := TButton.Create(MsgForm);
+      OKButton.Parent := ButtonPanel;
+      OKButton.Caption := 'موافق';
+      OKButton.ModalResult := mrOk;
+      OKButton.Width := ButtonWidth;
+      OKButton.Left := ButtonLeft;
+      OKButton.Top := 10;
+      ButtonLeft := ButtonLeft - ButtonWidth - 10;
+    end;
+    
+    if mbYes in Buttons then
+    begin
+      YesButton := TButton.Create(MsgForm);
+      YesButton.Parent := ButtonPanel;
+      YesButton.Caption := 'نعم';
+      YesButton.ModalResult := mrYes;
+      YesButton.Width := ButtonWidth;
+      YesButton.Left := ButtonLeft;
+      YesButton.Top := 10;
+      ButtonLeft := ButtonLeft - ButtonWidth - 10;
+    end;
+    
+    if mbNo in Buttons then
+    begin
+      NoButton := TButton.Create(MsgForm);
+      NoButton.Parent := ButtonPanel;
+      NoButton.Caption := 'لا';
+      NoButton.ModalResult := mrNo;
+      NoButton.Width := ButtonWidth;
+      NoButton.Left := ButtonLeft;
+      NoButton.Top := 10;
+      ButtonLeft := ButtonLeft - ButtonWidth - 10;
+    end;
+    
+    if mbCancel in Buttons then
+    begin
+      CancelButton := TButton.Create(MsgForm);
+      CancelButton.Parent := ButtonPanel;
+      CancelButton.Caption := 'إلغاء';
+      CancelButton.ModalResult := mrCancel;
+      CancelButton.Width := ButtonWidth;
+      CancelButton.Left := ButtonLeft;
+      CancelButton.Top := 10;
+    end;
+    
+    Result := MsgForm.ShowModal;
+  finally
+    MsgForm.Free;
+  end;
 end;
 
 end.
