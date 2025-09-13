@@ -4,7 +4,7 @@ object frmMain: TfrmMain
   BiDiMode = bdRightToLeft
   Caption = #217#8224#216#184#216#167#217#8230' '#216#165#216#175#216#167#216#177#216#169' '#216#167#217#8222#217#8230#216#174#216#167#216#178#217#8224' - '#216#167#217#8222#216#172#217#352#216#180' '#216#167#217#8222#217#8230#216#181#216#177#217#352
   ClientHeight = 600
-  ClientWidth = 900
+  ClientWidth = 884
   Color = clBtnFace
   Font.Charset = ARABIC_CHARSET
   Font.Color = clWindowText
@@ -21,12 +21,13 @@ object frmMain: TfrmMain
   object pnlTop: TPanel
     Left = 0
     Top = 0
-    Width = 900
+    Width = 884
     Height = 80
     Align = alTop
     Color = clNavy
     ParentBackground = False
     TabOrder = 0
+    ExplicitWidth = 900
     object lblTitle: TLabel
       Left = 250
       Top = 20
@@ -46,11 +47,12 @@ object frmMain: TfrmMain
   object pnlSearch: TPanel
     Left = 0
     Top = 80
-    Width = 900
+    Width = 884
     Height = 100
     Align = alTop
     BevelOuter = bvNone
     TabOrder = 1
+    ExplicitWidth = 900
     object lblSearchID: TLabel
       Left = 549
       Top = 35
@@ -99,11 +101,12 @@ object frmMain: TfrmMain
   object pnlWithdraw: TPanel
     Left = 0
     Top = 480
-    Width = 900
+    Width = 884
     Height = 80
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 2
+    ExplicitWidth = 900
     object lblWithdrawQty: TLabel
       Left = 601
       Top = 25
@@ -182,8 +185,12 @@ object frmMain: TfrmMain
   object StringGrid1: TStringGrid
     Left = 0
     Top = 180
-    Width = 900
+    Width = 884
     Height = 300
+    Margins.Left = 0
+    Margins.Top = 0
+    Margins.Right = 0
+    Margins.Bottom = 0
     Align = alClient
     BiDiMode = bdRightToLeft
     DefaultColWidth = 150
@@ -199,16 +206,19 @@ object frmMain: TfrmMain
     ParentBiDiMode = False
     ParentFont = False
     TabOrder = 3
+    ExplicitTop = 174
+    ExplicitWidth = 900
   end
   object StatusBar1: TStatusBar
     Left = 0
     Top = 560
-    Width = 900
+    Width = 884
     Height = 40
     BiDiMode = bdRightToLeft
     Panels = <>
     ParentBiDiMode = False
     SimplePanel = True
+    ExplicitWidth = 900
   end
   object MainMenu1: TMainMenu
     BiDiMode = bdRightToLeft

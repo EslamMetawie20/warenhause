@@ -294,8 +294,8 @@ begin
   if ShowArabicMessage(GetArabicText('MSG_EXIT_CONFIRM'),
     GetArabicText('SYSTEM_TITLE'), mtConfirmation, [mbYes, mbNo]) = mrYes then
   begin
-    Action := caFree;
     Application.Terminate;
+    Action := caFree;
   end
   else
     Action := caNone;
