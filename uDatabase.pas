@@ -1,4 +1,4 @@
-unit uDatabase;
+﻿unit uDatabase;
 
 interface
 
@@ -27,7 +27,7 @@ type
     function CheckPassword(const APassword: string): Boolean;
     function FindItem(const ItemID: string): TSparePartItem;
     function WithdrawItem(const ItemID: string; Quantity: Integer): Boolean;
-    function AddNewItem(const ItemID, ItemName, Location: string; 
+    function AddNewItem(const ItemID, ItemName, Location: string;
       Quantity: Integer; Price: Currency): Boolean;
     function GetItemDetails(const ItemID: string; var ItemName, Location: string;
       var AvailableQty: Integer; var Price: Currency): Boolean;
@@ -223,3 +223,4 @@ finalization
   DBManager.Free;
 
 end.
+

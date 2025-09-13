@@ -3,7 +3,7 @@ object frmAddItem: TfrmAddItem
   Top = 0
   BiDiMode = bdRightToLeft
   BorderStyle = bsDialog
-  Caption = 'إضافة قطعة جديدة'
+  Caption = #216#165#216#182#216#167#217#129#216#169' '#217#8218#216#183#216#185#216#169' '#216#172#216#175#217#352#216#175#216#169
   ClientHeight = 350
   ClientWidth = 450
   Color = clBtnFace
@@ -12,12 +12,10 @@ object frmAddItem: TfrmAddItem
   Font.Height = -13
   Font.Name = 'Tahoma'
   Font.Style = []
-  OldCreateOrder = False
   ParentBiDiMode = False
   Position = poMainFormCenter
   OnCreate = FormCreate
-  PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 16
   object pnlMain: TPanel
     Left = 0
     Top = 0
@@ -27,11 +25,11 @@ object frmAddItem: TfrmAddItem
     BevelOuter = bvNone
     TabOrder = 0
     object lblItemID: TLabel
-      Left = 350
+      Left = 224
       Top = 30
-      Width = 55
-      Height = 19
-      Caption = 'رقم القطعة:'
+      Width = 181
+      Height = 18
+      Caption = #216#177#217#8218#217#8230' '#216#167#217#8222#217#8218#216#183#216#185#216#169':'
       Font.Charset = ARABIC_CHARSET
       Font.Color = clWindowText
       Font.Height = -16
@@ -40,11 +38,11 @@ object frmAddItem: TfrmAddItem
       ParentFont = False
     end
     object lblItemName: TLabel
-      Left = 350
+      Left = 222
       Top = 70
-      Width = 55
-      Height = 19
-      Caption = 'اسم القطعة:'
+      Width = 183
+      Height = 18
+      Caption = #216#167#216#179#217#8230' '#216#167#217#8222#217#8218#216#183#216#185#216#169':'
       Font.Charset = ARABIC_CHARSET
       Font.Color = clWindowText
       Font.Height = -16
@@ -53,11 +51,11 @@ object frmAddItem: TfrmAddItem
       ParentFont = False
     end
     object lblQuantity: TLabel
-      Left = 350
+      Left = 251
       Top = 110
-      Width = 35
-      Height = 19
-      Caption = 'الكمية:'
+      Width = 134
+      Height = 18
+      Caption = #216#167#217#8222#217#402#217#8230#217#352#216#169':'
       Font.Charset = ARABIC_CHARSET
       Font.Color = clWindowText
       Font.Height = -16
@@ -66,11 +64,11 @@ object frmAddItem: TfrmAddItem
       ParentFont = False
     end
     object lblPrice: TLabel
-      Left = 350
+      Left = 289
       Top = 150
-      Width = 35
-      Height = 19
-      Caption = 'السعر:'
+      Width = 96
+      Height = 18
+      Caption = #216#167#217#8222#216#179#216#185#216#177':'
       Font.Charset = ARABIC_CHARSET
       Font.Color = clWindowText
       Font.Height = -16
@@ -79,11 +77,11 @@ object frmAddItem: TfrmAddItem
       ParentFont = False
     end
     object lblLocation: TLabel
-      Left = 350
+      Left = 187
       Top = 190
-      Width = 70
-      Height = 19
-      Caption = 'مكان التخزين:'
+      Width = 233
+      Height = 18
+      Caption = #217#8230#217#402#216#167#217#8224' '#216#167#217#8222#216#170#216#174#216#178#217#352#217#8224':'
       Font.Charset = ARABIC_CHARSET
       Font.Color = clWindowText
       Font.Height = -16
@@ -95,7 +93,7 @@ object frmAddItem: TfrmAddItem
       Left = 140
       Top = 30
       Width = 200
-      Height = 27
+      Height = 26
       BiDiMode = bdLeftToRight
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
@@ -110,7 +108,7 @@ object frmAddItem: TfrmAddItem
       Left = 140
       Top = 70
       Width = 200
-      Height = 27
+      Height = 26
       Font.Charset = ARABIC_CHARSET
       Font.Color = clWindowText
       Font.Height = -16
@@ -123,7 +121,7 @@ object frmAddItem: TfrmAddItem
       Left = 140
       Top = 110
       Width = 200
-      Height = 27
+      Height = 26
       BiDiMode = bdLeftToRight
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
@@ -139,7 +137,7 @@ object frmAddItem: TfrmAddItem
       Left = 140
       Top = 150
       Width = 200
-      Height = 27
+      Height = 26
       BiDiMode = bdLeftToRight
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
@@ -155,7 +153,7 @@ object frmAddItem: TfrmAddItem
       Left = 140
       Top = 190
       Width = 200
-      Height = 27
+      Height = 26
       Font.Charset = ARABIC_CHARSET
       Font.Color = clWindowText
       Font.Height = -16
@@ -163,14 +161,14 @@ object frmAddItem: TfrmAddItem
       Font.Style = []
       ParentFont = False
       TabOrder = 4
-      Text = 'المخزن / الرف / الدرج'
+      Text = #216#167#217#8222#217#8230#216#174#216#178#217#8224' / '#216#167#217#8222#216#177#217#129' / '#216#167#217#8222#216#175#216#177#216#172
     end
     object btnSave: TButton
       Left = 240
       Top = 250
       Width = 100
       Height = 35
-      Caption = 'حفظ'
+      Caption = #216#173#217#129#216#184
       Font.Charset = ARABIC_CHARSET
       Font.Color = clWindowText
       Font.Height = -16
@@ -185,7 +183,7 @@ object frmAddItem: TfrmAddItem
       Top = 250
       Width = 100
       Height = 35
-      Caption = 'إلغاء'
+      Caption = #216#165#217#8222#216#186#216#167#216#161
       Font.Charset = ARABIC_CHARSET
       Font.Color = clWindowText
       Font.Height = -16

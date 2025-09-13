@@ -1,4 +1,4 @@
-unit uLogin;
+﻿unit uLogin;
 
 interface
 
@@ -38,17 +38,24 @@ begin
   // إعدادات النموذج للغة العربية
   BiDiMode := bdRightToLeft;
   Position := poScreenCenter;
+
+  // تعيين النصوص من ملف uArabicTexts
+  Caption      := GetArabicText('FORM_LOGIN');
+  lblTitle.Caption := GetArabicText('SYSTEM_TITLE');
+  lblPassword.Caption := GetArabicText('PASSWORD');
+  btnLogin.Caption := GetArabicText('ENTER');
+  btnExit.Caption := GetArabicText('EXIT');
 end;
 
 procedure TfrmLogin.btnLoginClick(Sender: TObject);
 begin
   if Trim(edtPassword.Text) = '' then
   begin
-    MessageDlg('من فضلك أدخل كلمة المرور', mtWarning, [mbOK], 0);
+    MessageDlg(GetArabicText('MSG_PASSWORD_EMPTY'), mtWarning, [mbOK], 0);
     edtPassword.SetFocus;
     Exit;
   end;
-  
+
   if DBManager.CheckPassword(edtPassword.Text) then
   begin
     Application.CreateForm(TfrmMain, frmMain);
@@ -57,7 +64,7 @@ begin
   end
   else
   begin
-    MessageDlg('كلمة المرور غير صحيحة', mtError, [mbOK], 0);
+    MessageDlg(GetArabicText('MSG_PASSWORD_WRONG'), mtError, [mbOK], 0);
     edtPassword.Clear;
     edtPassword.SetFocus;
   end;
@@ -70,7 +77,7 @@ end;
 
 procedure TfrmLogin.edtPasswordKeyPress(Sender: TObject; var Key: Char);
 begin
-  if Key = #13 then // Enter key
+  if Key = #13 then // زر Enter
   begin
     btnLoginClick(Sender);
     Key := #0;
@@ -78,3 +85,4 @@ begin
 end;
 
 end.
+

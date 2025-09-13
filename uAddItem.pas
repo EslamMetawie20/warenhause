@@ -1,4 +1,4 @@
-unit uAddItem;
+﻿unit uAddItem;
 
 interface
 
@@ -61,35 +61,35 @@ begin
     edtItemID.SetFocus;
     Exit;
   end;
-  
+
   if Trim(edtItemName.Text) = '' then
   begin
     MessageDlg('من فضلك أدخل اسم القطعة', mtWarning, [mbOK], 0);
     edtItemName.SetFocus;
     Exit;
   end;
-  
+
   if not TryStrToInt(edtQuantity.Text, Qty) or (Qty < 0) then
   begin
     MessageDlg('من فضلك أدخل كمية صحيحة', mtWarning, [mbOK], 0);
     edtQuantity.SetFocus;
     Exit;
   end;
-  
+
   if not TryStrToCurr(edtPrice.Text, Price) or (Price < 0) then
   begin
     MessageDlg('من فضلك أدخل سعر صحيح', mtWarning, [mbOK], 0);
     edtPrice.SetFocus;
     Exit;
   end;
-  
+
   if Trim(edtLocation.Text) = '' then
   begin
     MessageDlg('من فضلك أدخل مكان التخزين', mtWarning, [mbOK], 0);
     edtLocation.SetFocus;
     Exit;
   end;
-  
+
   // حفظ البيانات
   if DBManager.AddNewItem(edtItemID.Text, edtItemName.Text, edtLocation.Text, Qty, Price) then
   begin
@@ -132,3 +132,4 @@ begin
 end;
 
 end.
+

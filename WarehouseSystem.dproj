@@ -105,6 +105,7 @@
         </DCCReference>
         <DCCReference Include="uDatabase.pas"/>
         <DCCReference Include="uReceipt.pas"/>
+        <DCCReference Include="uArabicTexts.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

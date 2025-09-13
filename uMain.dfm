@@ -2,7 +2,7 @@ object frmMain: TfrmMain
   Left = 0
   Top = 0
   BiDiMode = bdRightToLeft
-  Caption = 'نظام إدارة المخازن - الجيش المصري'
+  Caption = #217#8224#216#184#216#167#217#8230' '#216#165#216#175#216#167#216#177#216#169' '#216#167#217#8222#217#8230#216#174#216#167#216#178#217#8224' - '#216#167#217#8222#216#172#217#352#216#180' '#216#167#217#8222#217#8230#216#181#216#177#217#352
   ClientHeight = 600
   ClientWidth = 900
   Color = clBtnFace
@@ -12,14 +12,12 @@ object frmMain: TfrmMain
   Font.Name = 'Tahoma'
   Font.Style = []
   Menu = MainMenu1
-  OldCreateOrder = False
   ParentBiDiMode = False
   Position = poScreenCenter
   WindowState = wsMaximized
   OnClose = FormClose
   OnCreate = FormCreate
-  PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 16
   object pnlTop: TPanel
     Left = 0
     Top = 0
@@ -36,7 +34,7 @@ object frmMain: TfrmMain
       Height = 40
       Alignment = taCenter
       AutoSize = False
-      Caption = 'نظام إدارة المخازن'
+      Caption = #217#8224#216#184#216#167#217#8230' '#216#165#216#175#216#167#216#177#216#169' '#216#167#217#8222#217#8230#216#174#216#167#216#178#217#8224
       Font.Charset = ARABIC_CHARSET
       Font.Color = clWhite
       Font.Height = -32
@@ -54,11 +52,11 @@ object frmMain: TfrmMain
     BevelOuter = bvNone
     TabOrder = 1
     object lblSearchID: TLabel
-      Left = 650
+      Left = 549
       Top = 35
-      Width = 80
-      Height = 19
-      Caption = 'رقم القطعة:'
+      Width = 181
+      Height = 18
+      Caption = #216#177#217#8218#217#8230' '#216#167#217#8222#217#8218#216#183#216#185#216#169':'
       Font.Charset = ARABIC_CHARSET
       Font.Color = clWindowText
       Font.Height = -16
@@ -70,7 +68,7 @@ object frmMain: TfrmMain
       Left = 440
       Top = 35
       Width = 200
-      Height = 27
+      Height = 26
       BiDiMode = bdLeftToRight
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
@@ -87,7 +85,7 @@ object frmMain: TfrmMain
       Top = 32
       Width = 100
       Height = 35
-      Caption = 'بحث'
+      Caption = #216#168#216#173#216#171
       Font.Charset = ARABIC_CHARSET
       Font.Color = clWindowText
       Font.Height = -16
@@ -107,11 +105,11 @@ object frmMain: TfrmMain
     BevelOuter = bvNone
     TabOrder = 2
     object lblWithdrawQty: TLabel
-      Left = 650
+      Left = 601
       Top = 25
-      Width = 85
-      Height = 19
-      Caption = 'الكمية:'
+      Width = 134
+      Height = 18
+      Caption = #216#167#217#8222#217#402#217#8230#217#352#216#169':'
       Font.Charset = ARABIC_CHARSET
       Font.Color = clWindowText
       Font.Height = -16
@@ -123,7 +121,7 @@ object frmMain: TfrmMain
       Left = 540
       Top = 25
       Width = 100
-      Height = 27
+      Height = 26
       BiDiMode = bdLeftToRight
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
@@ -139,7 +137,7 @@ object frmMain: TfrmMain
       Top = 22
       Width = 100
       Height = 35
-      Caption = 'سحب'
+      Caption = #216#179#216#173#216#168
       Font.Charset = ARABIC_CHARSET
       Font.Color = clWindowText
       Font.Height = -16
@@ -154,7 +152,7 @@ object frmMain: TfrmMain
       Top = 22
       Width = 120
       Height = 35
-      Caption = 'طباعة'
+      Caption = #216#183#216#168#216#167#216#185#216#169
       Enabled = False
       Font.Charset = ARABIC_CHARSET
       Font.Color = clWindowText
@@ -170,7 +168,7 @@ object frmMain: TfrmMain
       Top = 22
       Width = 150
       Height = 35
-      Caption = 'إضافة قطعة'
+      Caption = #216#165#216#182#216#167#217#129#216#169' '#217#8218#216#183#216#185#216#169
       Font.Charset = ARABIC_CHARSET
       Font.Color = clWindowText
       Font.Height = -16
@@ -188,7 +186,6 @@ object frmMain: TfrmMain
     Height = 300
     Align = alClient
     BiDiMode = bdRightToLeft
-    ColCount = 5
     DefaultColWidth = 150
     DefaultRowHeight = 30
     FixedCols = 0
@@ -215,26 +212,27 @@ object frmMain: TfrmMain
   end
   object MainMenu1: TMainMenu
     BiDiMode = bdRightToLeft
+    ParentBiDiMode = False
     Left = 40
     Top = 190
     object mnuFile: TMenuItem
-      Caption = 'ملف'
+      Caption = #217#8230#217#8222#217#129
       object mnuAddItem: TMenuItem
-        Caption = 'إضافة قطعة'
+        Caption = #216#165#216#182#216#167#217#129#216#169' '#217#8218#216#183#216#185#216#169
         OnClick = btnAddItemClick
       end
       object mnuSeparator1: TMenuItem
         Caption = '-'
       end
       object mnuExit: TMenuItem
-        Caption = 'خروج'
+        Caption = #216#174#216#177#217#710#216#172
         OnClick = mnuExitClick
       end
     end
     object mnuHelp: TMenuItem
-      Caption = 'مساعدة'
+      Caption = #217#8230#216#179#216#167#216#185#216#175#216#169
       object mnuAbout: TMenuItem
-        Caption = 'حول البرنامج'
+        Caption = #216#173#217#710#217#8222' '#216#167#217#8222#216#168#216#177#217#8224#216#167#217#8230#216#172
         OnClick = mnuAboutClick
       end
     end

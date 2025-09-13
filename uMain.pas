@@ -1,4 +1,4 @@
-unit uMain;
+﻿unit uMain;
 
 interface
 
@@ -64,13 +64,13 @@ begin
   Caption := GetArabicText('FORM_MAIN');
   Position := poScreenCenter;
   WindowState := wsMaximized;
-  
-  // إعدادات اللوحة العلوية
+
+  // اللوحة العلوية
   pnlTop.Align := alTop;
   pnlTop.Height := 80;
   pnlTop.Color := clNavy;
   pnlTop.Font.Color := clWhite;
-  
+
   // عنوان النظام
   lblTitle.Parent := pnlTop;
   lblTitle.Caption := GetArabicText('SYSTEM_TITLE');
@@ -79,18 +79,24 @@ begin
   lblTitle.Font.Style := [fsBold];
   lblTitle.Font.Color := clWhite;
   lblTitle.Alignment := taCenter;
-  
+
   // لوحة البحث
   pnlSearch.Align := alTop;
   pnlSearch.Height := 100;
   pnlSearch.BevelOuter := bvNone;
-  
+  lblSearchID.Caption := GetArabicText('ITEM_NUMBER');
+  btnSearch.Caption := GetArabicText('SEARCH');
+
   // لوحة السحب
   pnlWithdraw.Align := alBottom;
   pnlWithdraw.Height := 80;
   pnlWithdraw.BevelOuter := bvNone;
-  
-  // Setup grid
+  lblWithdrawQty.Caption := GetArabicText('REQUIRED_QTY');
+  btnWithdraw.Caption := GetArabicText('WITHDRAW');
+  btnAddItem.Caption := GetArabicText('ADD_NEW_ITEM');
+  btnPrintReceipt.Caption := GetArabicText('PRINT_RECEIPT');
+
+  // إعداد الشبكة
   StringGrid1.Align := alClient;
   StringGrid1.BiDiMode := bdRightToLeft;
   StringGrid1.Font.Name := 'Arial';
@@ -100,21 +106,19 @@ begin
   StringGrid1.FixedRows := 1;
   StringGrid1.DefaultRowHeight := 30;
   StringGrid1.DefaultColWidth := 150;
-  
-  // تحديث عناوين النموذج والشبكة
-  
-  StringGrid1.Cells[0, 0] := 'رقم القطعة';
-  StringGrid1.Cells[1, 0] := 'اسم القطعة';
-  StringGrid1.Cells[2, 0] := 'الكمية المتاحة';
-  StringGrid1.Cells[3, 0] := 'مكان التخزين';
-  StringGrid1.Cells[4, 0] := 'السعر';
-  
-  
+
+  // عناوين الأعمدة
+  StringGrid1.Cells[0, 0] := GetArabicText('COL_ITEM_ID');
+  StringGrid1.Cells[1, 0] := GetArabicText('COL_ITEM_NAME');
+  StringGrid1.Cells[2, 0] := GetArabicText('COL_QUANTITY');
+  StringGrid1.Cells[3, 0] := GetArabicText('COL_LOCATION');
+  StringGrid1.Cells[4, 0] := GetArabicText('COL_PRICE');
+
   // شريط الحالة
   StatusBar1.SimplePanel := True;
   StatusBar1.BiDiMode := bdRightToLeft;
-  UpdateStatus('مرحباً بك في نظام إدارة المخازن');
-  
+  UpdateStatus(GetArabicText('MSG_WELCOME'));
+
   // تحميل جميع القطع
   LoadAllItems;
 end;
@@ -127,10 +131,10 @@ var
 begin
   Items := DBManager.GetAllItems;
   StringGrid1.RowCount := Items.Count + 1;
-  
+
   if Items.Count = 0 then
     StringGrid1.RowCount := 2;
-    
+
   for I := 0 to Items.Count - 1 do
   begin
     Item := Items[I];
@@ -148,14 +152,14 @@ var
 begin
   if Trim(edtSearchID.Text) = '' then
   begin
-    MessageDlg('من فضلك أدخل رقم القطعة', mtWarning, [mbOK], 0);
+    MessageDlg(GetArabicText('MSG_ENTER_ITEM_ID'), mtWarning, [mbOK], 0);
     edtSearchID.SetFocus;
     Exit;
   end;
-  
+
   FCurrentItemID := edtSearchID.Text;
   Item := DBManager.FindItem(FCurrentItemID);
-  
+
   if Item.ItemID <> '' then
   begin
     // عرض القطعة المطلوبة فقط
@@ -165,14 +169,14 @@ begin
     StringGrid1.Cells[2, 1] := IntToStr(Item.Quantity);
     StringGrid1.Cells[3, 1] := Item.Location;
     StringGrid1.Cells[4, 1] := FormatFloat('0.00', Item.Price);
-    
-    UpdateStatus('تم العثور على القطعة');
+
+    UpdateStatus(GetArabicText('MSG_ITEM_FOUND'));
     edtWithdrawQty.SetFocus;
   end
   else
   begin
-    UpdateStatus('القطعة غير موجودة في المخزن');
-    MessageDlg('القطعة غير موجودة في المخزن', mtInformation, [mbOK], 0);
+    UpdateStatus(GetArabicText('MSG_ITEM_NOT_FOUND'));
+    MessageDlg(GetArabicText('MSG_ITEM_NOT_FOUND'), mtInformation, [mbOK], 0);
   end;
 end;
 
@@ -194,26 +198,26 @@ var
 begin
   if FCurrentItemID = '' then
   begin
-    MessageDlg('من فضلك ابحث عن قطعة أولاً', mtWarning, [mbOK], 0);
+    MessageDlg(GetArabicText('MSG_SEARCH_FIRST'), mtWarning, [mbOK], 0);
     Exit;
   end;
-  
+
   if not TryStrToInt(edtWithdrawQty.Text, Qty) or (Qty <= 0) then
   begin
-    MessageDlg('من فضلك أدخل كمية صحيحة', mtWarning, [mbOK], 0);
+    MessageDlg(GetArabicText('MSG_ENTER_VALID_QTY'), mtWarning, [mbOK], 0);
     edtWithdrawQty.SetFocus;
     Exit;
   end;
-  
+
   if DBManager.GetItemDetails(FCurrentItemID, ItemName, Location, AvailableQty, Price) then
   begin
     if Qty > AvailableQty then
     begin
-      MessageDlg(Format('الكمية المطلوبة (%d) أكبر من المتاح (%d)', [Qty, AvailableQty]), 
-        mtWarning, [mbOK], 0);
+      MessageDlg(Format(GetArabicText('MSG_QTY_MORE_THAN_AVAIL') + ' (%d > %d)',
+        [Qty, AvailableQty]), mtWarning, [mbOK], 0);
       Exit;
     end;
-    
+
     if DBManager.WithdrawItem(FCurrentItemID, Qty) then
     begin
       FLastWithdrawDetails := Format(
@@ -223,21 +227,21 @@ begin
         'السعر الإجمالي: %.2f جنيه'#13#10 +
         'التاريخ: %s'#13#10 +
         'الوقت: %s',
-        [FCurrentItemID, ItemName, Qty, Price * Qty, 
+        [FCurrentItemID, ItemName, Qty, Price * Qty,
          DateToStr(Now), TimeToStr(Now)]
       );
-      
-      UpdateStatus('تم سحب القطع بنجاح');
-      MessageDlg('تمت عملية السحب بنجاح', mtInformation, [mbOK], 0);
+
+      UpdateStatus(GetArabicText('MSG_ITEMS_WITHDRAWN'));
+      MessageDlg(GetArabicText('MSG_WITHDRAW_SUCCESS'), mtInformation, [mbOK], 0);
       btnPrintReceipt.Enabled := True;
-      
+
       // تحديث الشبكة
       btnSearchClick(nil);
       edtWithdrawQty.Clear;
     end
     else
     begin
-      MessageDlg('فشلت عملية السحب', mtError, [mbOK], 0);
+      MessageDlg(GetArabicText('MSG_WITHDRAW_FAILED'), mtError, [mbOK], 0);
     end;
   end;
 end;
@@ -255,7 +259,7 @@ begin
   if FLastWithdrawDetails <> '' then
   begin
     PrintReceipt(FLastWithdrawDetails);
-    UpdateStatus('تمت طباعة الإيصال');
+    UpdateStatus(GetArabicText('MSG_RECEIPT_PRINTED'));
   end;
 end;
 
@@ -266,15 +270,13 @@ end;
 
 procedure TfrmMain.mnuAboutClick(Sender: TObject);
 begin
-  MessageDlg('نظام إدارة المخازن' + #13#10 + 
-              'الإصدار 1.0' + #13#10 + 
-              'الجيش المصري' + #13#10 + 
-              '2024', mtInformation, [mbOK], 0);
+  MessageDlg(GetArabicText('ABOUT_TEXT'), mtInformation, [mbOK], 0);
 end;
 
 procedure TfrmMain.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
-  if MessageDlg('هل تريد الخروج من البرنامج؟', mtConfirmation, [mbYes, mbNo], 0) = mrYes then
+  if MessageDlg(GetArabicText('MSG_EXIT_CONFIRM'),
+    mtConfirmation, [mbYes, mbNo], 0) = mrYes then
   begin
     Action := caFree;
     Application.Terminate;
@@ -288,5 +290,5 @@ begin
   StatusBar1.SimpleText := '  ' + Msg;
 end;
 
-
 end.
+
