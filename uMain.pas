@@ -39,6 +39,7 @@ type
     procedure mnuExitClick(Sender: TObject);
     procedure mnuAboutClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure FormResize(Sender: TObject);
   private
     FCurrentItemID: string;
     FLastWithdrawDetails: string;
@@ -107,6 +108,9 @@ begin
 
   // إعداد الشبكة
   StringGrid1.Align := alClient;
+  StringGrid1.AlignWithMargins := False;
+  StringGrid1.Margins.SetBounds(0,0,0,0);
+  StringGrid1.Anchors := [akLeft, akTop, akRight, akBottom];
   StringGrid1.BiDiMode := bdRightToLeft;
   StringGrid1.Font.Name := 'Arial';
   StringGrid1.Font.Size := 12;
@@ -130,6 +134,12 @@ begin
 
   // تحميل جميع القطع
   LoadAllItems;
+
+  // sorgt dafür, dass die Spalten automatisch angepasst werden
+  Self.OnResize := FormResize;
+
+  // einmal sofort beim Start aufrufen
+  FormResize(Self);
 end;
 
 procedure TfrmMain.LoadAllItems;
@@ -304,6 +314,28 @@ end;
 procedure TfrmMain.UpdateStatus(const Msg: string);
 begin
   StatusBar1.SimpleText := '  ' + Msg;
+end;
+
+procedure TfrmMain.FormResize(Sender: TObject);
+var
+  W, q15, q25, q30: Integer;
+begin
+  // verfügbare Breite im Grid
+  W := StringGrid1.ClientWidth;
+
+  // Spaltenbreiten prozentual verteilen
+  q15 := (W * 15) div 100;
+  q25 := (W * 25) div 100;
+  q30 := (W * 30) div 100;
+
+  if StringGrid1.ColCount >= 5 then
+  begin
+    StringGrid1.ColWidths[0] := q15; // Spalte: Artikelnummer
+    StringGrid1.ColWidths[1] := q30; // Spalte: Artikelname
+    StringGrid1.ColWidths[2] := q15; // Spalte: Menge
+    StringGrid1.ColWidths[3] := q25; // Spalte: Lagerort
+    StringGrid1.ColWidths[4] := W - (q15 + q30 + q15 + q25); // Spalte: Preis
+  end;
 end;
 
 function TfrmMain.ShowArabicMessage(const AText, ACaption: string;
