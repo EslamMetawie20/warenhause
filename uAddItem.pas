@@ -63,20 +63,19 @@ begin
   btnCancel.Caption   := 'إلغاء';
 
   edtLocation.Text    := 'المخزن / الرف / الدرج';
+
+  // عرض الرقم التالي وجعله غير قابل للتحرير
+  edtItemID.ReadOnly := True;
+  edtItemID.Color := clBtnFace;
+  edtItemID.Text := DBManager.GetNextID;
 end;
 
 procedure TfrmAddItem.btnSaveClick(Sender: TObject);
 var
   Qty: Integer;
   Price: Currency;
+  NewItemID: string;
 begin
-  if Trim(edtItemID.Text) = '' then
-  begin
-    MessageDlg('من فضلك أدخل رقم القطعة', mtWarning, [mbOK], 0);
-    edtItemID.SetFocus;
-    Exit;
-  end;
-
   if Trim(edtItemName.Text) = '' then
   begin
     MessageDlg('من فضلك أدخل اسم القطعة', mtWarning, [mbOK], 0);
@@ -105,16 +104,10 @@ begin
     Exit;
   end;
 
-  if DBManager.AddNewItem(edtItemID.Text, edtItemName.Text, edtLocation.Text, Qty, Price) then
-  begin
-    MessageDlg('تم حفظ القطعة بنجاح', mtInformation, [mbOK], 0);
-    ClearFields;
-    edtItemID.SetFocus;
-  end
-  else
-  begin
-    MessageDlg('رقم القطعة موجود بالفعل', mtError, [mbOK], 0);
-  end;
+  NewItemID := DBManager.AddNewItem(edtItemName.Text, edtLocation.Text, Qty, Price);
+  MessageDlg('تم حفظ القطعة برقم: ' + NewItemID, mtInformation, [mbOK], 0);
+  ClearFields;
+  edtItemName.SetFocus;
 end;
 
 procedure TfrmAddItem.btnCancelClick(Sender: TObject);
@@ -136,7 +129,7 @@ end;
 
 procedure TfrmAddItem.ClearFields;
 begin
-  edtItemID.Clear;
+  edtItemID.Text := DBManager.GetNextID;
   edtItemName.Clear;
   edtQuantity.Clear;
   edtPrice.Clear;

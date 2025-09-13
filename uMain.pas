@@ -94,17 +94,17 @@ begin
   pnlSearch.Align := alTop;
   pnlSearch.Height := 100;
   pnlSearch.BevelOuter := bvNone;
-  lblSearchID.Caption := GetArabicText('ITEM_NUMBER');
-  btnSearch.Caption := GetArabicText('SEARCH');
+  lblSearchID.Caption := 'رقم القطعة:';
+  btnSearch.Caption := 'بحث';
 
   // لوحة السحب
   pnlWithdraw.Align := alBottom;
   pnlWithdraw.Height := 80;
   pnlWithdraw.BevelOuter := bvNone;
-  lblWithdrawQty.Caption := GetArabicText('REQUIRED_QTY');
-  btnWithdraw.Caption := GetArabicText('WITHDRAW');
-  btnAddItem.Caption := GetArabicText('ADD_NEW_ITEM');
-  btnPrintReceipt.Caption := GetArabicText('PRINT_RECEIPT');
+  lblWithdrawQty.Caption := 'الكمية:';
+  btnWithdraw.Caption := 'سحب';
+  btnAddItem.Caption := 'إضافة قطعة جديدة';
+  btnPrintReceipt.Caption := 'طباعة الإيصال';
 
   // إعداد الشبكة
   StringGrid1.Align := alClient;
@@ -121,11 +121,11 @@ begin
   StringGrid1.DefaultColWidth := 150;
 
   // عناوين الأعمدة
-  StringGrid1.Cells[0, 0] := GetArabicText('COL_ITEM_ID');
-  StringGrid1.Cells[1, 0] := GetArabicText('COL_ITEM_NAME');
-  StringGrid1.Cells[2, 0] := GetArabicText('COL_QUANTITY');
-  StringGrid1.Cells[3, 0] := GetArabicText('COL_LOCATION');
-  StringGrid1.Cells[4, 0] := GetArabicText('COL_PRICE');
+  StringGrid1.Cells[0, 0] := 'رقم القطعة';
+  StringGrid1.Cells[1, 0] := 'اسم القطعة';
+  StringGrid1.Cells[2, 0] := 'الكمية';
+  StringGrid1.Cells[3, 0] := 'مكان التخزين';
+  StringGrid1.Cells[4, 0] := 'السعر';
 
   // شريط الحالة
   StatusBar1.SimplePanel := True;

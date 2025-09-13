@@ -7,10 +7,10 @@ uses
 
 type
   TSparePartItem = record
-    ItemID: string[50];
-    ItemName: string[100];
+    ItemID: string;
+    ItemName: string;
     Quantity: Integer;
-    Location: string[100];
+    Location: string;
     Price: Currency;
   end;
 
@@ -19,19 +19,22 @@ type
     FDataFile: string;
     FItems: TList;
     FPassword: string;
+    FNextID: Integer;
     procedure LoadData;
     procedure SaveData;
+    function GenerateNextID: string;
   public
     constructor Create;
     destructor Destroy; override;
     function CheckPassword(const APassword: string): Boolean;
     function FindItem(const ItemID: string): TSparePartItem;
     function WithdrawItem(const ItemID: string; Quantity: Integer): Boolean;
-    function AddNewItem(const ItemID, ItemName, Location: string;
-      Quantity: Integer; Price: Currency): Boolean;
+    function AddNewItem(const ItemName, Location: string;
+      Quantity: Integer; Price: Currency): string;
     function GetItemDetails(const ItemID: string; var ItemName, Location: string;
       var AvailableQty: Integer; var Price: Currency): Boolean;
     function GetAllItems: TList;
+    function GetNextID: string;
   end;
 
 var
@@ -50,6 +53,7 @@ begin
   FDataFile := ExtractFilePath(ParamStr(0)) + 'warehouse.dat';
   FPassword := APP_PASSWORD;
   FItems := TList.Create;
+  FNextID := 1;
   LoadData;
 end;
 
@@ -67,56 +71,68 @@ end;
 procedure TDatabaseManager.LoadData;
 var
   FileStream: TFileStream;
+  Reader: TBinaryReader;
   Item: PSparePartItem;
   Count, I: Integer;
 begin
   if not FileExists(FDataFile) then
   begin
-    // بيانات تجريبية بالعربية
-    AddNewItem('001', 'بطارية 12 فولت', 'المخزن الرئيسي أ1', 50, 250.00);
-    AddNewItem('002', 'فلتر هواء', 'المخزن الرئيسي أ2', 30, 150.00);
-    AddNewItem('003', 'زيت محرك', 'المخزن ب1', 100, 85.00);
-    AddNewItem('004', 'إطار احتياطي', 'المخزن ج1', 20, 800.00);
-    AddNewItem('005', 'مفتاح 19 مم', 'خزانة الأدوات', 15, 45.00);
-    SaveData;
+    // Start with empty database - user can add items
+    FNextID := 1;
     Exit;
   end;
 
   try
     FileStream := TFileStream.Create(FDataFile, fmOpenRead);
+    Reader := TBinaryReader.Create(FileStream, TEncoding.UTF8);
     try
-      FileStream.Read(Count, SizeOf(Integer));
+      FNextID := Reader.ReadInteger;
+      Count := Reader.ReadInteger;
       for I := 0 to Count - 1 do
       begin
         New(Item);
-        FileStream.Read(Item^, SizeOf(TSparePartItem));
+        Item^.ItemID := Reader.ReadString;
+        Item^.ItemName := Reader.ReadString;
+        Item^.Quantity := Reader.ReadInteger;
+        Item^.Location := Reader.ReadString;
+        Item^.Price := Reader.ReadDouble;
         FItems.Add(Item);
       end;
     finally
+      Reader.Free;
       FileStream.Free;
     end;
   except
     // في حالة فشل القراءة
+    FNextID := 1;
   end;
 end;
 
 procedure TDatabaseManager.SaveData;
 var
   FileStream: TFileStream;
+  Writer: TBinaryWriter;
   Count, I: Integer;
   Item: PSparePartItem;
 begin
   try
     FileStream := TFileStream.Create(FDataFile, fmCreate);
+    Writer := TBinaryWriter.Create(FileStream, TEncoding.UTF8);
     try
+      Writer.Write(FNextID);
       Count := FItems.Count;
-      FileStream.Write(Count, SizeOf(Integer));
+      Writer.Write(Count);
       for I := 0 to FItems.Count - 1 do
       begin
         Item := PSparePartItem(FItems[I]);
-        FileStream.Write(Item^, SizeOf(TSparePartItem));
+        Writer.Write(Item^.ItemID);
+        Writer.Write(Item^.ItemName);
+        Writer.Write(Item^.Quantity);
+        Writer.Write(Item^.Location);
+        Writer.Write(Item^.Price);
       end;
     finally
+      Writer.Free;
       FileStream.Free;
     end;
   except
@@ -168,31 +184,31 @@ begin
   end;
 end;
 
-function TDatabaseManager.AddNewItem(const ItemID, ItemName, Location: string;
-  Quantity: Integer; Price: Currency): Boolean;
+function TDatabaseManager.GenerateNextID: string;
+begin
+  Result := IntToStr(FNextID);
+  Inc(FNextID);
+end;
+
+function TDatabaseManager.GetNextID: string;
+begin
+  Result := IntToStr(FNextID);
+end;
+
+function TDatabaseManager.AddNewItem(const ItemName, Location: string;
+  Quantity: Integer; Price: Currency): string;
 var
   Item: PSparePartItem;
-  I: Integer;
 begin
-  // التحقق من عدم وجود القطعة
-  for I := 0 to FItems.Count - 1 do
-  begin
-    if PSparePartItem(FItems[I])^.ItemID = ItemID then
-    begin
-      Result := False;
-      Exit;
-    end;
-  end;
-
   New(Item);
-  Item^.ItemID := ItemID;
+  Item^.ItemID := GenerateNextID;
   Item^.ItemName := ItemName;
   Item^.Location := Location;
   Item^.Quantity := Quantity;
   Item^.Price := Price;
   FItems.Add(Item);
   SaveData;
-  Result := True;
+  Result := Item^.ItemID;
 end;
 
 function TDatabaseManager.GetItemDetails(const ItemID: string; var ItemName, Location: string;

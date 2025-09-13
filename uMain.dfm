@@ -24,10 +24,9 @@ object frmMain: TfrmMain
     Width = 884
     Height = 80
     Align = alTop
-    Color = clNavy
+    Color = clDarkolivegreen
     ParentBackground = False
     TabOrder = 0
-    ExplicitWidth = 900
     object lblTitle: TLabel
       Left = 250
       Top = 20
@@ -52,7 +51,6 @@ object frmMain: TfrmMain
     Align = alTop
     BevelOuter = bvNone
     TabOrder = 1
-    ExplicitWidth = 900
     object lblSearchID: TLabel
       Left = 549
       Top = 35
@@ -106,7 +104,8 @@ object frmMain: TfrmMain
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 2
-    ExplicitWidth = 900
+    ExplicitLeft = 104
+    ExplicitTop = 520
     object lblWithdrawQty: TLabel
       Left = 601
       Top = 25
@@ -206,8 +205,6 @@ object frmMain: TfrmMain
     ParentBiDiMode = False
     ParentFont = False
     TabOrder = 3
-    ExplicitTop = 174
-    ExplicitWidth = 900
   end
   object StatusBar1: TStatusBar
     Left = 0
@@ -218,7 +215,6 @@ object frmMain: TfrmMain
     Panels = <>
     ParentBiDiMode = False
     SimplePanel = True
-    ExplicitWidth = 900
   end
   object MainMenu1: TMainMenu
     BiDiMode = bdRightToLeft
