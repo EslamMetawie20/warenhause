@@ -20,7 +20,6 @@ object frmMain: TfrmMain
   OnDestroy = FormDestroy
   OnResize = FormResize
   TextHeight = 16
-
   object pnlHeader: TPanel
     Left = 0
     Top = 0
@@ -31,6 +30,9 @@ object frmMain: TfrmMain
     Color = 2825232
     ParentBackground = False
     TabOrder = 0
+    DesignSize = (
+      1200
+      80)
     object imgLogo: TImage
       Left = 20
       Top = 10
@@ -40,11 +42,10 @@ object frmMain: TfrmMain
       Stretch = True
     end
     object lblSystemTitle: TLabel
-      Left = 100
+      Left = 305
       Top = 15
-      Width = 500
-      Height = 30
-      Alignment = taLeftJustify
+      Width = 295
+      Height = 22
       Caption = #1606#1592#1575#1605' '#1573#1583#1575#1585#1577' '#1602#1591#1593' '#1575#1604#1594#1610#1575#1585' - '#1575#1604#1602#1608#1575#1578' '#1575#1604#1605#1587#1604#1581#1577' '#1575#1604#1605#1589#1585#1610#1577
       Font.Charset = ARABIC_CHARSET
       Font.Color = clWhite
@@ -56,8 +57,8 @@ object frmMain: TfrmMain
     object lblDateTime: TLabel
       Left = 1000
       Top = 45
-      Width = 180
-      Height = 20
+      Width = 57
+      Height = 15
       Alignment = taRightJustify
       Anchors = [akTop, akRight]
       Caption = 'Date Time'
@@ -69,7 +70,6 @@ object frmMain: TfrmMain
       ParentFont = False
     end
   end
-
   object pnlContent: TPanel
     Left = 0
     Top = 80
@@ -91,11 +91,11 @@ object frmMain: TfrmMain
       ParentBackground = False
       TabOrder = 0
       object pnlSearchSection: TPanel
+        AlignWithMargins = True
         Left = 10
         Top = 10
         Width = 300
         Height = 140
-        AlignWithMargins = True
         Margins.Left = 10
         Margins.Top = 10
         Margins.Right = 10
@@ -106,10 +106,10 @@ object frmMain: TfrmMain
         ParentBackground = False
         TabOrder = 0
         object lblSearchID: TLabel
-          Left = 20
+          Left = 52
           Top = 45
-          Width = 80
-          Height = 20
+          Width = 48
+          Height = 16
           Caption = #1585#1602#1605' '#1575#1604#1602#1591#1593#1577':'
           Font.Charset = ARABIC_CHARSET
           Font.Color = clWindowText
@@ -117,22 +117,6 @@ object frmMain: TfrmMain
           Font.Name = 'Arial'
           Font.Style = []
           ParentFont = False
-        end
-        object edtSearchID: TEdit
-          Left = 20
-          Top = 70
-          Width = 180
-          Height = 25
-          BiDiMode = bdRightToLeft
-          Font.Charset = ARABIC_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -13
-          Font.Name = 'Arial'
-          Font.Style = []
-          ParentBiDiMode = False
-          ParentFont = False
-          TabOrder = 0
-          OnKeyPress = edtSearchIDKeyPress
         end
         object btnSearch: TSpeedButton
           Left = 210
@@ -164,13 +148,29 @@ object frmMain: TfrmMain
           ParentFont = False
           OnClick = btnShowAllClick
         end
+        object edtSearchID: TEdit
+          Left = 20
+          Top = 70
+          Width = 180
+          Height = 25
+          BiDiMode = bdRightToLeft
+          Font.Charset = ARABIC_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -13
+          Font.Name = 'Arial'
+          Font.Style = []
+          ParentBiDiMode = False
+          ParentFont = False
+          TabOrder = 0
+          OnKeyPress = edtSearchIDKeyPress
+        end
       end
       object pnlWithdrawSection: TPanel
+        AlignWithMargins = True
         Left = 10
         Top = 155
         Width = 300
         Height = 120
-        AlignWithMargins = True
         Margins.Left = 10
         Margins.Top = 5
         Margins.Right = 10
@@ -181,10 +181,10 @@ object frmMain: TfrmMain
         ParentBackground = False
         TabOrder = 1
         object lblWithdrawQty: TLabel
-          Left = 20
+          Left = 72
           Top = 45
-          Width = 80
-          Height = 20
+          Width = 28
+          Height = 16
           Caption = #1575#1604#1603#1605#1610#1577':'
           Font.Charset = ARABIC_CHARSET
           Font.Color = clWindowText
@@ -225,11 +225,11 @@ object frmMain: TfrmMain
         end
       end
       object pnlCartSection: TPanel
+        AlignWithMargins = True
         Left = 10
         Top = 285
         Width = 300
         Height = 140
-        AlignWithMargins = True
         Margins.Left = 10
         Margins.Top = 5
         Margins.Right = 10
@@ -238,12 +238,12 @@ object frmMain: TfrmMain
         BevelOuter = bvNone
         Color = clWhite
         ParentBackground = False
-        TabOrder = 2
+        TabOrder = 3
         object lblCartStatus: TLabel
-          Left = 20
+          Left = 202
           Top = 45
-          Width = 270
-          Height = 20
+          Width = 88
+          Height = 16
           Caption = #1575#1604#1608#1575'renkorb '#1601#1575#1585#1594
           Font.Charset = ARABIC_CHARSET
           Font.Color = clGray
@@ -251,22 +251,6 @@ object frmMain: TfrmMain
           Font.Name = 'Arial'
           Font.Style = [fsBold]
           ParentFont = False
-        end
-        object btnViewCart: TButton
-          Left = 20
-          Top = 70
-          Width = 130
-          Height = 35
-          Caption = #1593#1585#1590' '#1575#1604#1608#1575'renkorb'
-          Enabled = False
-          Font.Charset = ARABIC_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -13
-          Font.Name = 'Arial'
-          Font.Style = []
-          ParentFont = False
-          TabOrder = 0
-          OnClick = btnViewCartClick
         end
         object btnClearCart: TSpeedButton
           Left = 160
@@ -284,13 +268,29 @@ object frmMain: TfrmMain
           ParentFont = False
           OnClick = btnClearCartClick
         end
+        object btnViewCart: TButton
+          Left = 20
+          Top = 70
+          Width = 130
+          Height = 35
+          Caption = #1593#1585#1590' '#1575#1604#1608#1575'renkorb'
+          Enabled = False
+          Font.Charset = ARABIC_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -13
+          Font.Name = 'Arial'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 0
+          OnClick = btnViewCartClick
+        end
       end
       object pnlActionsSection: TPanel
+        AlignWithMargins = True
         Left = 10
         Top = 435
         Width = 300
         Height = 180
-        AlignWithMargins = True
         Margins.Left = 10
         Margins.Top = 5
         Margins.Right = 10
@@ -365,15 +365,17 @@ object frmMain: TfrmMain
         Height = 40
         Align = alTop
         BevelOuter = bvNone
-        Color = 13882323
+        Color = clLightgray
         ParentBackground = False
         TabOrder = 0
+        DesignSize = (
+          880
+          40)
         object lblGridTitle: TLabel
-          Left = 20
+          Left = 135
           Top = 10
-          Width = 200
-          Height = 20
-          Alignment = taLeftJustify
+          Width = 85
+          Height = 19
           Caption = #1602#1575#1574#1605#1577' '#1602#1591#1593' '#1575#1604#1594#1610#1575#1585
           Font.Charset = ARABIC_CHARSET
           Font.Color = clWindowText
@@ -385,8 +387,8 @@ object frmMain: TfrmMain
         object lblRecordCount: TLabel
           Left = 710
           Top = 10
-          Width = 150
-          Height = 20
+          Width = 71
+          Height = 16
           Alignment = taRightJustify
           Anchors = [akTop, akRight]
           Caption = #1593#1583#1583' '#1575#1604#1587#1580#1604#1575#1578': 0'
@@ -399,27 +401,24 @@ object frmMain: TfrmMain
         end
       end
       object StringGrid1: TStringGrid
+        AlignWithMargins = True
         Left = 10
         Top = 50
         Width = 860
         Height = 535
-        Align = alClient
-        AlignWithMargins = True
-        BiDiMode = bdRightToLeft
-        ColCount = 5
-        DefaultRowHeight = 35
-        FixedColor = 4868682
-        FixedRows = 1
-        Font.Charset = ARABIC_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -13
-        Font.Name = 'Arial'
-        Font.Size = 10
-        Font.Style = []
         Margins.Left = 10
         Margins.Top = 10
         Margins.Right = 10
         Margins.Bottom = 10
+        Align = alClient
+        BiDiMode = bdRightToLeft
+        DefaultRowHeight = 35
+        FixedColor = 4868682
+        Font.Charset = ARABIC_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -13
+        Font.Name = 'Arial'
+        Font.Style = []
         Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRowSelect, goThumbTracking]
         ParentBiDiMode = False
         ParentFont = False
@@ -429,7 +428,6 @@ object frmMain: TfrmMain
       end
     end
   end
-
   object pnlFooter: TPanel
     Left = 0
     Top = 675
@@ -452,14 +450,12 @@ object frmMain: TfrmMain
       SimplePanel = True
     end
   end
-
   object tmrClock: TTimer
     Enabled = False
     OnTimer = tmrClockTimer
     Left = 72
     Top = 200
   end
-
   object MainMenu1: TMainMenu
     BiDiMode = bdRightToLeft
     ParentBiDiMode = False

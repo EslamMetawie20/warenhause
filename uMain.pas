@@ -300,7 +300,7 @@ begin
   pnlWithdrawSection.AlignWithMargins := True;
   pnlWithdrawSection.Margins.SetBounds(10, 5, 10, 5);
 
-  CreateSectionHeader(pnlWithdrawSection, 'إضافة للواrenkorb');
+  CreateSectionHeader(pnlWithdrawSection, 'إضافة  السلة');
 
   lblWithdrawQty.Parent := pnlWithdrawSection;
   lblWithdrawQty.Caption := 'الكمية:';
@@ -317,7 +317,7 @@ begin
   edtWithdrawQty.BiDiMode := bdRightToLeft;
 
   btnAddToCart.Parent := pnlWithdrawSection;
-  btnAddToCart.Caption := 'إضافة للواrenkorb';
+  btnAddToCart.Caption := 'إضافة  السلة';
   btnAddToCart.Left := 210;
   btnAddToCart.Top := 68;
   btnAddToCart.Width := 80;
@@ -331,10 +331,10 @@ begin
   pnlCartSection.AlignWithMargins := True;
   pnlCartSection.Margins.SetBounds(10, 5, 10, 5);
 
-  CreateSectionHeader(pnlCartSection, 'الواrenkorb');
+  CreateSectionHeader(pnlCartSection, 'السلة');
 
   lblCartStatus.Parent := pnlCartSection;
-  lblCartStatus.Caption := 'الواrenkorb فارغ';
+  lblCartStatus.Caption := 'السلة  فارغ';
   lblCartStatus.Left := 20;
   lblCartStatus.Top := 45;
   lblCartStatus.Width := 270;
@@ -342,7 +342,7 @@ begin
   lblCartStatus.Font.Style := [fsBold];
 
   btnViewCart.Parent := pnlCartSection;
-  btnViewCart.Caption := 'عرض الواrenkorb';
+  btnViewCart.Caption := 'عرض ا لسلة ';
   btnViewCart.Left := 20;
   btnViewCart.Top := 70;
   btnViewCart.Width := 130;
@@ -584,8 +584,8 @@ begin
   // Add to cart
   if CartManager.AddItem(FCurrentItemID, Qty) then
   begin
-    UpdateStatus(Format('تم إضافة %d من العنصر %s إلى الواrenkorب', [Qty, FCurrentItemID]));
-    ShowArabicMessage('تم إضافة العنصر إلى الواrenkorب بنجاح',
+    UpdateStatus(Format('تم إضافة %d من العنصر %s إلى السلة ', [Qty, FCurrentItemID]));
+    ShowArabicMessage('تم إضافة العنصر إلى  ا لسلة بنجاح',
       'تمت الإضافة', mtInformation, [mbOK]);
     edtWithdrawQty.Clear;
     edtSearchID.SetFocus;
@@ -610,11 +610,11 @@ begin
   if CartManager.IsEmpty then
     Exit;
 
-  if ShowArabicMessage('هل تريد إفراغ الواrenkorب؟'#13#10'سيتم حذف جميع العناصر.',
+  if ShowArabicMessage('هل تريد إفراغ السلة ؟'#13#10'سيتم حذف جميع العناصر.',
     'تأكيد الإفراغ', mtConfirmation, [mbYes, mbNo]) = mrYes then
   begin
     CartManager.ClearCart;
-    UpdateStatus('تم إفراغ الواrenkorب');
+    UpdateStatus('تم إفراغ السلة ');
   end;
 end;
 
@@ -622,7 +622,7 @@ procedure TfrmMain.UpdateCartStatus;
 begin
   if CartManager.IsEmpty then
   begin
-    lblCartStatus.Caption := 'الواrenkorب فارغ';
+    lblCartStatus.Caption := 'السلة  فارغ';
     lblCartStatus.Font.Color := clGray;
     btnViewCart.Enabled := False;
     btnClearCart.Enabled := False;
@@ -679,7 +679,11 @@ end;
 
 procedure TfrmMain.mnuExitClick(Sender: TObject);
 begin
-  Close;
+  if ShowArabicMessage(GetArabicText('MSG_EXIT_CONFIRM'),
+    GetArabicText('SYSTEM_TITLE'), mtConfirmation, [mbYes, mbNo]) = mrYes then
+  begin
+    Application.Terminate;
+  end;
 end;
 
 procedure TfrmMain.mnuAboutClick(Sender: TObject);
@@ -694,6 +698,7 @@ begin
     GetArabicText('SYSTEM_TITLE'), mtConfirmation, [mbYes, mbNo]) = mrYes then
   begin
     Action := caFree;
+    Application.Terminate;
   end
   else
     Action := caNone;
