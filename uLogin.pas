@@ -4,7 +4,8 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes,
-  Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls;
+  Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls,
+  Vcl.Imaging.pngimage;
 
 type
   TfrmLogin = class(TForm)
@@ -14,14 +15,13 @@ type
     edtPassword: TEdit;
     btnLogin: TButton;
     btnExit: TButton;
+    procedure FormCreate(Sender: TObject);
     procedure btnLoginClick(Sender: TObject);
     procedure btnExitClick(Sender: TObject);
     procedure edtPasswordKeyPress(Sender: TObject; var Key: Char);
-    procedure FormCreate(Sender: TObject);
   private
     function ShowArabicMessage(const AText, ACaption: string;
       DlgType: TMsgDlgType; Buttons: TMsgDlgButtons): Integer;
-    { Private declarations }
   public
     { Public declarations }
   end;
@@ -37,38 +37,45 @@ uses uDatabase, uMain, uArabicTexts;
 
 procedure TfrmLogin.FormCreate(Sender: TObject);
 begin
-  // إعدادات النموذج للغة العربية
+  // Basic Form Settings
   BiDiMode := bdRightToLeft;
   Position := poScreenCenter;
+  Caption := 'نظام إدارة قطع الغيار - تسجيل الدخول';
 
-  // تعيين النصوص من ملف uArabicTexts
-  Caption      := GetArabicText('FORM_LOGIN');
-  lblTitle.Caption := GetArabicText('SYSTEM_TITLE');
-  lblPassword.Caption := GetArabicText('PASSWORD');
-  btnLogin.Caption := GetArabicText('ENTER');
-  btnExit.Caption := GetArabicText('EXIT');
+  // Setup Arabic text
+  lblTitle.Caption := 'نظام إدارة المخازن - الجيش المصري';
+  lblPassword.Caption := 'كلمة المرور:';
+  btnLogin.Caption := 'دخول';
+  btnExit.Caption := 'خروج';
+
+  // Focus on password field
+  edtPassword.SetFocus;
 end;
+
 
 procedure TfrmLogin.btnLoginClick(Sender: TObject);
 begin
   if Trim(edtPassword.Text) = '' then
   begin
-    ShowArabicMessage(GetArabicText('MSG_PASSWORD_EMPTY'), 
-      GetArabicText('SYSTEM_TITLE'), mtWarning, [mbOK]);
+    ShowArabicMessage('يرجى إدخال كلمة المرور',
+      'تسجيل الدخول', mtWarning, [mbOK]);
     edtPassword.SetFocus;
     Exit;
   end;
 
   if DBManager.CheckPassword(edtPassword.Text) then
   begin
+    ShowArabicMessage('مرحباً بك في النظام',
+      'تسجيل دخول ناجح', mtInformation, [mbOK]);
+
     Application.CreateForm(TfrmMain, frmMain);
     frmMain.Show;
     Hide;
   end
   else
   begin
-    ShowArabicMessage(GetArabicText('MSG_PASSWORD_WRONG'), 
-      GetArabicText('SYSTEM_TITLE'), mtError, [mbOK]);
+    ShowArabicMessage('كلمة المرور غير صحيحة',
+      'خطأ في تسجيل الدخول', mtError, [mbOK]);
     edtPassword.Clear;
     edtPassword.SetFocus;
   end;
@@ -76,12 +83,14 @@ end;
 
 procedure TfrmLogin.btnExitClick(Sender: TObject);
 begin
-  Application.Terminate;
+  if ShowArabicMessage('هل تريد الخروج من النظام؟',
+    'تأكيد الخروج', mtConfirmation, [mbYes, mbNo]) = mrYes then
+    Application.Terminate;
 end;
 
 procedure TfrmLogin.edtPasswordKeyPress(Sender: TObject; var Key: Char);
 begin
-  if Key = #13 then // زر Enter
+  if Key = #13 then // Enter key
   begin
     btnLoginClick(Sender);
     Key := #0;
@@ -94,6 +103,8 @@ var
   MsgForm: TForm;
   MsgLabel: TLabel;
   ButtonPanel: TPanel;
+  IconPanel: TPanel;
+  IconLabel: TLabel;
   OKButton, YesButton, NoButton, CancelButton: TButton;
   ButtonWidth, ButtonLeft: Integer;
 begin
@@ -103,10 +114,56 @@ begin
     MsgForm.BiDiMode := bdRightToLeft;
     MsgForm.Position := poScreenCenter;
     MsgForm.BorderStyle := bsDialog;
-    MsgForm.Width := 400;
-    MsgForm.Height := 200;
-    
-    // إنشاء التسمية للنص
+    MsgForm.Width := 450;
+    MsgForm.Height := 220;
+    MsgForm.Color := clWhite;
+    MsgForm.Font.Name := 'Arial';
+
+    // Icon panel for message type
+    IconPanel := TPanel.Create(MsgForm);
+    IconPanel.Parent := MsgForm;
+    IconPanel.Left := 20;
+    IconPanel.Top := 20;
+    IconPanel.Width := 60;
+    IconPanel.Height := 60;
+    IconPanel.BevelOuter := bvNone;
+
+    IconLabel := TLabel.Create(MsgForm);
+    IconLabel.Parent := IconPanel;
+    IconLabel.Font.Size := 24;
+    IconLabel.Font.Style := [fsBold];
+    IconLabel.Align := alClient;
+    IconLabel.Alignment := taCenter;
+    IconLabel.Layout := tlCenter;
+
+    case DlgType of
+      mtInformation:
+      begin
+        IconLabel.Caption := 'ℹ';
+        IconLabel.Font.Color := $1F7A1F; // Green
+        IconPanel.Color := $F0FFF0;
+      end;
+      mtWarning:
+      begin
+        IconLabel.Caption := '⚠';
+        IconLabel.Font.Color := $FF8C00; // Orange
+        IconPanel.Color := $FFF8DC;
+      end;
+      mtError:
+      begin
+        IconLabel.Caption := '✕';
+        IconLabel.Font.Color := $DC143C; // Red
+        IconPanel.Color := $FFE4E1;
+      end;
+      mtConfirmation:
+      begin
+        IconLabel.Caption := '?';
+        IconLabel.Font.Color := $4169E1; // Blue
+        IconPanel.Color := $F0F8FF;
+      end;
+    end;
+
+    // Message label
     MsgLabel := TLabel.Create(MsgForm);
     MsgLabel.Parent := MsgForm;
     MsgLabel.Caption := AText;
@@ -114,23 +171,24 @@ begin
     MsgLabel.Font.Name := 'Arial';
     MsgLabel.Font.Size := 11;
     MsgLabel.WordWrap := True;
-    MsgLabel.Left := 20;
-    MsgLabel.Top := 40;
-    MsgLabel.Width := 340;
-    MsgLabel.Height := 60;
+    MsgLabel.Left := 100;
+    MsgLabel.Top := 30;
+    MsgLabel.Width := 320;
+    MsgLabel.Height := 80;
     MsgLabel.Alignment := taRightJustify;
-    
-    // لوحة الأزرار
+
+    // Button panel
     ButtonPanel := TPanel.Create(MsgForm);
     ButtonPanel.Parent := MsgForm;
     ButtonPanel.Align := alBottom;
-    ButtonPanel.Height := 50;
+    ButtonPanel.Height := 60;
     ButtonPanel.BevelOuter := bvNone;
-    
-    ButtonWidth := 75;
+    ButtonPanel.Color := $F8F8F8;
+
+    ButtonWidth := 80;
     ButtonLeft := MsgForm.Width - 100;
-    
-    // إنشاء الأزرار حسب الحاجة
+
+    // Create buttons
     if mbOK in Buttons then
     begin
       OKButton := TButton.Create(MsgForm);
@@ -139,10 +197,13 @@ begin
       OKButton.ModalResult := mrOk;
       OKButton.Width := ButtonWidth;
       OKButton.Left := ButtonLeft;
-      OKButton.Top := 10;
-      ButtonLeft := ButtonLeft - ButtonWidth - 10;
+      OKButton.Top := 15;
+      OKButton.Height := 30;
+      OKButton.Font.Style := [fsBold];
+      OKButton.Font.Color := clWhite;
+      ButtonLeft := ButtonLeft - ButtonWidth - 15;
     end;
-    
+
     if mbYes in Buttons then
     begin
       YesButton := TButton.Create(MsgForm);
@@ -151,10 +212,13 @@ begin
       YesButton.ModalResult := mrYes;
       YesButton.Width := ButtonWidth;
       YesButton.Left := ButtonLeft;
-      YesButton.Top := 10;
-      ButtonLeft := ButtonLeft - ButtonWidth - 10;
+      YesButton.Top := 15;
+      YesButton.Height := 30;
+      YesButton.Font.Style := [fsBold];
+      YesButton.Font.Color := clWhite;
+      ButtonLeft := ButtonLeft - ButtonWidth - 15;
     end;
-    
+
     if mbNo in Buttons then
     begin
       NoButton := TButton.Create(MsgForm);
@@ -163,10 +227,13 @@ begin
       NoButton.ModalResult := mrNo;
       NoButton.Width := ButtonWidth;
       NoButton.Left := ButtonLeft;
-      NoButton.Top := 10;
-      ButtonLeft := ButtonLeft - ButtonWidth - 10;
+      NoButton.Top := 15;
+      NoButton.Height := 30;
+      NoButton.Font.Style := [fsBold];
+      NoButton.Font.Color := clWhite;
+      ButtonLeft := ButtonLeft - ButtonWidth - 15;
     end;
-    
+
     if mbCancel in Buttons then
     begin
       CancelButton := TButton.Create(MsgForm);
@@ -175,9 +242,12 @@ begin
       CancelButton.ModalResult := mrCancel;
       CancelButton.Width := ButtonWidth;
       CancelButton.Left := ButtonLeft;
-      CancelButton.Top := 10;
+      CancelButton.Top := 15;
+      CancelButton.Height := 30;
+      CancelButton.Font.Style := [fsBold];
+      CancelButton.Font.Color := clWhite;
     end;
-    
+
     Result := MsgForm.ShowModal;
   finally
     MsgForm.Free;
@@ -185,4 +255,3 @@ begin
 end;
 
 end.
-
