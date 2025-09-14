@@ -5,7 +5,7 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes,
   Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls,
-  Vcl.ComCtrls, Vcl.Menus, Vcl.Grids, Vcl.Buttons, Vcl.Imaging.pngimage;
+  Vcl.ComCtrls, Vcl.Menus, Vcl.Grids, Vcl.Buttons, Vcl.Imaging.pngimage, uCart;
 
 type
   TfrmMain = class(TForm)
@@ -33,10 +33,16 @@ type
     btnSearch: TSpeedButton;
     btnShowAll: TSpeedButton;
 
-    // Withdraw Components
+    // Withdraw Components (now Cart)
     lblWithdrawQty: TLabel;
     edtWithdrawQty: TEdit;
-    btnWithdraw: TButton;
+    btnAddToCart: TButton;
+
+    // Cart Components
+    pnlCartSection: TPanel;
+    lblCartStatus: TLabel;
+    btnViewCart: TButton;
+    btnClearCart: TSpeedButton;
 
     // Action Components
     btnAddItem: TSpeedButton;
@@ -67,7 +73,9 @@ type
     procedure btnSearchClick(Sender: TObject);
     procedure btnShowAllClick(Sender: TObject);
     procedure edtSearchIDKeyPress(Sender: TObject; var Key: Char);
-    procedure btnWithdrawClick(Sender: TObject);
+    procedure btnAddToCartClick(Sender: TObject);
+    procedure btnViewCartClick(Sender: TObject);
+    procedure btnClearCartClick(Sender: TObject);
     procedure btnAddItemClick(Sender: TObject);
     procedure btnPrintReceiptClick(Sender: TObject);
     procedure btnExportClick(Sender: TObject);
@@ -92,6 +100,8 @@ type
     function ShowArabicMessage(const AText, ACaption: string;
       DlgType: TMsgDlgType; Buttons: TMsgDlgButtons): Integer;
     procedure CreateSectionHeader(Panel: TPanel; const Title: string);
+    procedure UpdateCartStatus;
+    procedure OnCartChanged(Sender: TObject);
   public
     { Public declarations }
   end;
@@ -101,7 +111,7 @@ var
 
 implementation
 
-uses uDatabase, uAddItem, uReceipt, uArabicTexts;
+uses uDatabase, uAddItem, uReceipt, uArabicTexts, uCartForm;
 
 {$R *.dfm}
 
@@ -127,9 +137,13 @@ begin
   mnuHelp.Caption := GetArabicText('MENU_HELP');
   mnuAbout.Caption := GetArabicText('MENU_ABOUT');
 
+  // Cart Event Setup
+  CartManager.OnCartChanged := OnCartChanged;
+
   // Load data and update display
   LoadAllItems;
   UpdateRecordCount;
+  UpdateCartStatus;
   UpdateStatus(GetArabicText('MSG_WELCOME'));
 
   // Start clock timer
@@ -286,7 +300,7 @@ begin
   pnlWithdrawSection.AlignWithMargins := True;
   pnlWithdrawSection.Margins.SetBounds(10, 5, 10, 5);
 
-  CreateSectionHeader(pnlWithdrawSection, 'سحب القطع');
+  CreateSectionHeader(pnlWithdrawSection, 'إضافة للواrenkorb');
 
   lblWithdrawQty.Parent := pnlWithdrawSection;
   lblWithdrawQty.Caption := 'الكمية:';
@@ -302,13 +316,47 @@ begin
   edtWithdrawQty.Height := 25;
   edtWithdrawQty.BiDiMode := bdRightToLeft;
 
-  btnWithdraw.Parent := pnlWithdrawSection;
-  btnWithdraw.Caption := 'تأكيد السحب';
-  btnWithdraw.Left := 210;
-  btnWithdraw.Top := 68;
-  btnWithdraw.Width := 80;
-  btnWithdraw.Height := 29;
-  // btnWithdraw.Flat := True; // Not available for TButton
+  btnAddToCart.Parent := pnlWithdrawSection;
+  btnAddToCart.Caption := 'إضافة للواrenkorb';
+  btnAddToCart.Left := 210;
+  btnAddToCart.Top := 68;
+  btnAddToCart.Width := 80;
+  btnAddToCart.Height := 29;
+
+  // Cart Section
+  pnlCartSection.Parent := pnlSidebar;
+  pnlCartSection.Align := alTop;
+  pnlCartSection.Height := 140;
+  pnlCartSection.BevelOuter := bvNone;
+  pnlCartSection.AlignWithMargins := True;
+  pnlCartSection.Margins.SetBounds(10, 5, 10, 5);
+
+  CreateSectionHeader(pnlCartSection, 'الواrenkorb');
+
+  lblCartStatus.Parent := pnlCartSection;
+  lblCartStatus.Caption := 'الواrenkorb فارغ';
+  lblCartStatus.Left := 20;
+  lblCartStatus.Top := 45;
+  lblCartStatus.Width := 270;
+  lblCartStatus.Height := 20;
+  lblCartStatus.Font.Style := [fsBold];
+
+  btnViewCart.Parent := pnlCartSection;
+  btnViewCart.Caption := 'عرض الواrenkorb';
+  btnViewCart.Left := 20;
+  btnViewCart.Top := 70;
+  btnViewCart.Width := 130;
+  btnViewCart.Height := 35;
+  btnViewCart.Enabled := False;
+
+  btnClearCart.Parent := pnlCartSection;
+  btnClearCart.Caption := 'إفراغ';
+  btnClearCart.Left := 160;
+  btnClearCart.Top := 68;
+  btnClearCart.Width := 80;
+  btnClearCart.Height := 29;
+  btnClearCart.Flat := True;
+  btnClearCart.Enabled := False;
 
   // Actions Section
   pnlActionsSection.Parent := pnlSidebar;
@@ -334,7 +382,6 @@ begin
   btnPrintReceipt.Top := 90;
   btnPrintReceipt.Width := 270;
   btnPrintReceipt.Height := 35;
-  // btnPrintReceipt.Flat := True; // Not available for TButton
   btnPrintReceipt.Enabled := False;
 
   btnExport.Parent := pnlActionsSection;
@@ -515,64 +562,89 @@ begin
   end;
 end;
 
-procedure TfrmMain.btnWithdrawClick(Sender: TObject);
+procedure TfrmMain.btnAddToCartClick(Sender: TObject);
 var
   Qty: Integer;
-  ItemName, Location: string;
-  AvailableQty: Integer;
-  Price: Currency;
 begin
   if FCurrentItemID = '' then
   begin
-    ShowArabicMessage(GetArabicText('MSG_SEARCH_FIRST'),
-      GetArabicText('SYSTEM_TITLE'), mtWarning, [mbOK]);
+    ShowArabicMessage('يرجى البحث عن عنصر أولاً',
+      'تنبيه', mtWarning, [mbOK]);
     Exit;
   end;
 
   if not TryStrToInt(edtWithdrawQty.Text, Qty) or (Qty <= 0) then
   begin
-    ShowArabicMessage(GetArabicText('MSG_ENTER_VALID_QTY'),
-      GetArabicText('SYSTEM_TITLE'), mtWarning, [mbOK]);
+    ShowArabicMessage('يرجى إدخال كمية صالحة',
+      'خطأ في البيانات', mtWarning, [mbOK]);
     edtWithdrawQty.SetFocus;
     Exit;
   end;
 
-  if DBManager.GetItemDetails(FCurrentItemID, ItemName, Location, AvailableQty, Price) then
+  // Add to cart
+  if CartManager.AddItem(FCurrentItemID, Qty) then
   begin
-    if Qty > AvailableQty then
-    begin
-      ShowArabicMessage(Format(GetArabicText('MSG_QTY_MORE_THAN_AVAIL') + ' (%d > %d)',
-        [Qty, AvailableQty]), GetArabicText('SYSTEM_TITLE'), mtWarning, [mbOK]);
-      Exit;
-    end;
-
-    if DBManager.WithdrawItem(FCurrentItemID, Qty) then
-    begin
-      FLastWithdrawDetails := Format(
-        'رقم القطعة: %s'#13#10 +
-        'اسم القطعة: %s'#13#10 +
-        'الكمية المسحوبة: %d'#13#10 +
-        'السعر الإجمالي: %.2f جنيه'#13#10 +
-        'التاريخ: %s'#13#10 +
-        'الوقت: %s',
-        [FCurrentItemID, ItemName, Qty, Price * Qty,
-         DateToStr(Now), TimeToStr(Now)]
-      );
-
-      UpdateStatus(GetArabicText('MSG_ITEMS_WITHDRAWN'));
-      ShowArabicMessage(GetArabicText('MSG_WITHDRAW_SUCCESS'),
-        GetArabicText('SYSTEM_TITLE'), mtInformation, [mbOK]);
-      btnPrintReceipt.Enabled := True;
-
-      btnSearchClick(nil);
-      edtWithdrawQty.Clear;
-    end
-    else
-    begin
-      ShowArabicMessage(GetArabicText('MSG_WITHDRAW_FAILED'),
-        GetArabicText('SYSTEM_TITLE'), mtError, [mbOK]);
-    end;
+    UpdateStatus(Format('تم إضافة %d من العنصر %s إلى الواrenkorب', [Qty, FCurrentItemID]));
+    ShowArabicMessage('تم إضافة العنصر إلى الواrenkorب بنجاح',
+      'تمت الإضافة', mtInformation, [mbOK]);
+    edtWithdrawQty.Clear;
+    edtSearchID.SetFocus;
+  end
+  else
+  begin
+    ShowArabicMessage('فشل في إضافة العنصر - تحقق من الكمية المتاحة',
+      'خطأ', mtError, [mbOK]);
+    edtWithdrawQty.SetFocus;
   end;
+end;
+
+procedure TfrmMain.btnViewCartClick(Sender: TObject);
+begin
+  if not Assigned(frmCart) then
+    Application.CreateForm(TfrmCart, frmCart);
+  frmCart.ShowModal;
+end;
+
+procedure TfrmMain.btnClearCartClick(Sender: TObject);
+begin
+  if CartManager.IsEmpty then
+    Exit;
+
+  if ShowArabicMessage('هل تريد إفراغ الواrenkorب؟'#13#10'سيتم حذف جميع العناصر.',
+    'تأكيد الإفراغ', mtConfirmation, [mbYes, mbNo]) = mrYes then
+  begin
+    CartManager.ClearCart;
+    UpdateStatus('تم إفراغ الواrenkorب');
+  end;
+end;
+
+procedure TfrmMain.UpdateCartStatus;
+begin
+  if CartManager.IsEmpty then
+  begin
+    lblCartStatus.Caption := 'الواrenkorب فارغ';
+    lblCartStatus.Font.Color := clGray;
+    btnViewCart.Enabled := False;
+    btnClearCart.Enabled := False;
+  end
+  else
+  begin
+    lblCartStatus.Caption := Format('%d عناصر - %.2f جنيه',
+      [CartManager.GetTotalItems, CartManager.GetTotalValue]);
+    lblCartStatus.Font.Color := $1565C0; // Blue
+    btnViewCart.Enabled := True;
+    btnClearCart.Enabled := True;
+  end;
+end;
+
+procedure TfrmMain.OnCartChanged(Sender: TObject);
+begin
+  UpdateCartStatus;
+  // Update grid to reflect any potential changes
+  if FCurrentItemID <> '' then
+    btnSearchClick(nil)
+  else
+    LoadAllItems;
 end;
 
 procedure TfrmMain.btnAddItemClick(Sender: TObject);

@@ -208,12 +208,12 @@ object frmMain: TfrmMain
           ParentFont = False
           TabOrder = 0
         end
-        object btnWithdraw: TButton
+        object btnAddToCart: TButton
           Left = 210
           Top = 68
           Width = 80
           Height = 29
-          Caption = #1578#1571#1603#1610#1583' '#1575#1604#1587#1581#1576
+          Caption = #1573#1590#1575#1601#1577' '#1604#1604#1608#1575'renkorb'
           Font.Charset = ARABIC_CHARSET
           Font.Color = clWindowText
           Font.Height = -13
@@ -221,12 +221,73 @@ object frmMain: TfrmMain
           Font.Style = [fsBold]
           ParentFont = False
           TabOrder = 1
-          OnClick = btnWithdrawClick
+          OnClick = btnAddToCartClick
+        end
+      end
+      object pnlCartSection: TPanel
+        Left = 10
+        Top = 285
+        Width = 300
+        Height = 140
+        AlignWithMargins = True
+        Margins.Left = 10
+        Margins.Top = 5
+        Margins.Right = 10
+        Margins.Bottom = 5
+        Align = alTop
+        BevelOuter = bvNone
+        Color = clWhite
+        ParentBackground = False
+        TabOrder = 2
+        object lblCartStatus: TLabel
+          Left = 20
+          Top = 45
+          Width = 270
+          Height = 20
+          Caption = #1575#1604#1608#1575'renkorb '#1601#1575#1585#1594
+          Font.Charset = ARABIC_CHARSET
+          Font.Color = clGray
+          Font.Height = -13
+          Font.Name = 'Arial'
+          Font.Style = [fsBold]
+          ParentFont = False
+        end
+        object btnViewCart: TButton
+          Left = 20
+          Top = 70
+          Width = 130
+          Height = 35
+          Caption = #1593#1585#1590' '#1575#1604#1608#1575'renkorb'
+          Enabled = False
+          Font.Charset = ARABIC_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -13
+          Font.Name = 'Arial'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 0
+          OnClick = btnViewCartClick
+        end
+        object btnClearCart: TSpeedButton
+          Left = 160
+          Top = 68
+          Width = 80
+          Height = 29
+          Caption = #1573#1601#1585#1575#1594
+          Enabled = False
+          Flat = True
+          Font.Charset = ARABIC_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -13
+          Font.Name = 'Arial'
+          Font.Style = []
+          ParentFont = False
+          OnClick = btnClearCartClick
         end
       end
       object pnlActionsSection: TPanel
         Left = 10
-        Top = 285
+        Top = 435
         Width = 300
         Height = 180
         AlignWithMargins = True
