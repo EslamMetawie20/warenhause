@@ -21,6 +21,7 @@ type
     procedure edtPasswordKeyPress(Sender: TObject; var Key: Char);
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     // Dynamically created components
     pnlHeader: TPanel;
@@ -83,6 +84,11 @@ procedure TfrmLogin.FormShow(Sender: TObject);
 begin
   if Assigned(edtPassword) then
     edtPassword.SetFocus;
+end;
+
+procedure TfrmLogin.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  Action := caFree;
 end;
 
 procedure TfrmLogin.SetupUI;
@@ -275,9 +281,7 @@ begin
 
   if DBManager.CheckPassword(edtPassword.Text) then
   begin
-    Application.CreateForm(TfrmMain, frmMain);
-    frmMain.Show;
-    Hide;
+    ModalResult := mrOK;
   end
   else
   begin

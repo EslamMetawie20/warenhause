@@ -47,7 +47,6 @@ type
     // Action Components
     btnAddItem: TSpeedButton;
     btnPrintReceipt: TButton;
-    btnExport: TButton;
 
     // Main Content Components
     pnlGridHeader: TPanel;
@@ -60,8 +59,7 @@ type
     MainMenu1: TMainMenu;
     mnuFile: TMenuItem;
     mnuAddItem: TMenuItem;
-    mnuExport: TMenuItem;
-    mnuSeparator1: TMenuItem;
+      mnuSeparator1: TMenuItem;
     mnuExit: TMenuItem;
     mnuView: TMenuItem;
     mnuRefresh: TMenuItem;
@@ -78,7 +76,6 @@ type
     procedure btnClearCartClick(Sender: TObject);
     procedure btnAddItemClick(Sender: TObject);
     procedure btnPrintReceiptClick(Sender: TObject);
-    procedure btnExportClick(Sender: TObject);
     procedure mnuExitClick(Sender: TObject);
     procedure mnuAboutClick(Sender: TObject);
     procedure mnuRefreshClick(Sender: TObject);
@@ -130,7 +127,6 @@ begin
   // Menu Setup
   mnuFile.Caption := GetArabicText('MENU_FILE');
   mnuAddItem.Caption := GetArabicText('MENU_ADD_ITEM');
-  mnuExport.Caption := 'تصدير البيانات';
   mnuExit.Caption := GetArabicText('MENU_EXIT');
   mnuView.Caption := 'عرض';
   mnuRefresh.Caption := 'تحديث';
@@ -383,14 +379,6 @@ begin
   btnPrintReceipt.Width := 270;
   btnPrintReceipt.Height := 35;
   btnPrintReceipt.Enabled := False;
-
-  btnExport.Parent := pnlActionsSection;
-  btnExport.Caption := 'تصدير البيانات';
-  btnExport.Left := 20;
-  btnExport.Top := 135;
-  btnExport.Width := 270;
-  btnExport.Height := 35;
-  // btnExport.Flat := True; // Not available for TButton
 end;
 
 procedure TfrmMain.CreateSectionHeader(Panel: TPanel; const Title: string);
@@ -664,12 +652,6 @@ begin
   end;
 end;
 
-procedure TfrmMain.btnExportClick(Sender: TObject);
-begin
-  UpdateStatus('جاري تصدير البيانات...');
-  // Export functionality would be implemented here
-  ShowArabicMessage('تم تصدير البيانات بنجاح', 'تصدير', mtInformation, [mbOK]);
-end;
 
 procedure TfrmMain.mnuRefreshClick(Sender: TObject);
 begin

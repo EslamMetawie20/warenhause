@@ -331,21 +331,6 @@ object frmMain: TfrmMain
           TabOrder = 0
           OnClick = btnPrintReceiptClick
         end
-        object btnExport: TButton
-          Left = 20
-          Top = 135
-          Width = 270
-          Height = 35
-          Caption = #1578#1589#1583#1610#1585' '#1575#1604#1576#1610#1575#1606#1575#1578
-          Font.Charset = ARABIC_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -13
-          Font.Name = 'Arial'
-          Font.Style = [fsBold]
-          ParentFont = False
-          TabOrder = 1
-          OnClick = btnExportClick
-        end
       end
     end
     object pnlMainContent: TPanel
@@ -466,10 +451,6 @@ object frmMain: TfrmMain
       object mnuAddItem: TMenuItem
         Caption = #1573#1590#1575#1601#1577' '#1602#1591#1593#1577' '#1580#1583#1610#1583#1577
         OnClick = btnAddItemClick
-      end
-      object mnuExport: TMenuItem
-        Caption = #1578#1589#1583#1610#1585' '#1575#1604#1576#1610#1575#1606#1575#1578
-        OnClick = btnExportClick
       end
       object mnuSeparator1: TMenuItem
         Caption = '-'
