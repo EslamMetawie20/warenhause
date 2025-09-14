@@ -27,8 +27,6 @@ object frmLogin: TfrmLogin
     Color = clWhite
     ParentBackground = False
     TabOrder = 0
-    ExplicitWidth = 348
-    ExplicitHeight = 212
     object lblTitle: TLabel
       Left = 25
       Top = 30
