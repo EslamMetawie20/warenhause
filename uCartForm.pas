@@ -63,7 +63,7 @@ var
 
 implementation
 
-uses uArabicTexts, uSimpleReceipt, uDatabase;
+uses uArabicTexts, uPDFReceipt, uDatabase;
 
 {$R *.dfm}
 
@@ -324,11 +324,10 @@ begin
     // 2. SaveDialog anzeigen
     var SaveDialog := TSaveDialog.Create(Self);
     var ReceiptPath := '';
-    var ReceiptContent := '';
     var AllSuccessful := False;
     try
-      SaveDialog.Filter := 'HTML Files (*.html)|*.html';
-      SaveDialog.DefaultExt := 'html';
+      SaveDialog.Filter := 'Text Files (*.txt)|*.txt';
+      SaveDialog.DefaultExt := 'txt';
       SaveDialog.FileName := 'ايصال_سحب_' + FormatDateTime('yyyy_mm_dd_hh_nn_ss', Now);
       SaveDialog.Title := 'حفظ إيصال السحب';
       SaveDialog.Options := SaveDialog.Options + [ofOverwritePrompt];
@@ -336,7 +335,6 @@ begin
       if SaveDialog.Execute then
       begin
         ReceiptPath := SaveDialog.FileName;
-        ReceiptContent := TSimpleReceiptGenerator.CreateReceiptHTML(CartItemsCopy);
 
         // SICHERE Entnahme ohne ProcessCheckout
         AllSuccessful := True;
@@ -348,6 +346,13 @@ begin
             Break;
           end;
         end;
+
+        // PDF generieren nach erfolgreicher Entnahme
+        if AllSuccessful then
+        begin
+          if not TPDFReceiptGenerator.GenerateReceiptPDF(CartItemsCopy, ReceiptPath) then
+            AllSuccessful := False;
+        end;
       end;
     finally
       SaveDialog.Free;
@@ -356,37 +361,27 @@ begin
     // 3. Ergebnisse verarbeiten
     if (ReceiptPath <> '') and AllSuccessful then
     begin
-      // Receipt-Datei speichern
-      try
-        with TStringList.Create do
-        try
-          Text := ReceiptContent;
-          SaveToFile(ReceiptPath, TEncoding.UTF8);
-        finally
-          Free;
-        end;
+      // Warenkorb leeren
+      CartManager.ClearCart;
 
-        // Warenkorb leeren
-        CartManager.ClearCart;
-
-        // Erfolg anzeigen
-        ShowArabicMessage('تم السحب بنجاح!'#13#10'تم حفظ الإيصال في:'#13#10 + ExtractFileName(ReceiptPath),
-          'نجح', mtInformation, [mbOK]);
-      except
-        ShowArabicMessage('تم السحب بنجاح ولكن فشل حفظ الإيصال', 'تنبيه', mtWarning, [mbOK]);
-      end;
+      // Erfolg anzeigen
+      ShowArabicMessage('تم السحب بنجاح!'#13#10'تم حفظ الإيصال في:'#13#10 + ExtractFileName(ReceiptPath),
+        'نجح', mtInformation, [mbOK]);
 
       // Form schließen
       ModalResult := mrOk;
     end
-    else if ReceiptPath = '' then
+    else if ReceiptPath <> '' then
     begin
-      // User cancelled save dialog - do nothing
-      Exit;
+      // Fehler beim PDF-Export, aber Entnahme war erfolgreich
+      CartManager.ClearCart;
+      ShowArabicMessage('تم السحب بنجاح ولكن فشل حفظ الإيصال', 'تنبيه', mtWarning, [mbOK]);
+      ModalResult := mrOk;
     end
     else
     begin
-      ShowArabicMessage('فشل في بعض عمليات السحب', 'خطأ', mtError, [mbOK]);
+      // User cancelled save dialog - do nothing
+      Exit;
     end;
   finally
     CartItemsCopy.Free;
