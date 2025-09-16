@@ -326,8 +326,8 @@ begin
     var ReceiptPath := '';
     var AllSuccessful := False;
     try
-      SaveDialog.Filter := 'Text Files (*.txt)|*.txt';
-      SaveDialog.DefaultExt := 'txt';
+      SaveDialog.Filter := 'PDF Files (*.pdf)|*.pdf';
+      SaveDialog.DefaultExt := 'pdf';
       SaveDialog.FileName := 'ايصال_سحب_' + FormatDateTime('yyyy_mm_dd_hh_nn_ss', Now);
       SaveDialog.Title := 'حفظ إيصال السحب';
       SaveDialog.Options := SaveDialog.Options + [ofOverwritePrompt];
@@ -365,7 +365,7 @@ begin
       CartManager.ClearCart;
 
       // Erfolg anzeigen
-      ShowArabicMessage('تم السحب بنجاح!'#13#10'تم حفظ الإيصال في:'#13#10 + ExtractFileName(ReceiptPath),
+      ShowArabicMessage('تم السحب بنجاح!'#13#10'تم حفظ إيصال PDF في:'#13#10 + ExtractFileName(ReceiptPath),
         'نجح', mtInformation, [mbOK]);
 
       // Form schließen
@@ -375,7 +375,7 @@ begin
     begin
       // Fehler beim PDF-Export, aber Entnahme war erfolgreich
       CartManager.ClearCart;
-      ShowArabicMessage('تم السحب بنجاح ولكن فشل حفظ الإيصال', 'تنبيه', mtWarning, [mbOK]);
+      ShowArabicMessage('تم السحب بنجاح ولكن فشل حفظ إيصال PDF', 'تنبيه', mtWarning, [mbOK]);
       ModalResult := mrOk;
     end
     else
