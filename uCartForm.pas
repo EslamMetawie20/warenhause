@@ -322,7 +322,7 @@ begin
       CartItemsCopy.Add(CartManager.GetCartItems[I]);
 
     // 2. SaveDialog anzeigen
-    var SaveDialog := TSaveDialog.Create(nil);
+    var SaveDialog := TSaveDialog.Create(Self);
     var ReceiptPath := '';
     var ReceiptContent := '';
     var AllSuccessful := False;
@@ -331,6 +331,7 @@ begin
       SaveDialog.DefaultExt := 'html';
       SaveDialog.FileName := 'ايصال_سحب_' + FormatDateTime('yyyy_mm_dd_hh_nn_ss', Now);
       SaveDialog.Title := 'حفظ إيصال السحب';
+      SaveDialog.Options := SaveDialog.Options + [ofOverwritePrompt];
 
       if SaveDialog.Execute then
       begin
@@ -376,7 +377,7 @@ begin
       end;
 
       // Form schließen
-      Hide;
+      ModalResult := mrOk;
     end
     else if ReceiptPath = '' then
     begin
@@ -407,7 +408,7 @@ end;
 
 procedure TfrmCart.btnCloseClick(Sender: TObject);
 begin
-  Hide;
+  ModalResult := mrCancel;
 end;
 
 procedure TfrmCart.btnRemoveItemClick(Sender: TObject);
