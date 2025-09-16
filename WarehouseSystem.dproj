@@ -52,6 +52,7 @@
         <DCC_N>false</DCC_N>
         <DCC_S>false</DCC_S>
         <DCC_ImageBase>00400000</DCC_ImageBase>
+        <Icon_MainIcon>Resources\ArmedForces.ico</Icon_MainIcon>
         <SanitizedProjectName>WarehouseSystem</SanitizedProjectName>
         <DCC_Namespace>Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
         <VerInfo_Locale>1031</VerInfo_Locale>
@@ -64,6 +65,7 @@
         <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+        <Icon_MainIcon>Resources\ArmedForces.ico</Icon_MainIcon>
         <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
         <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
     </PropertyGroup>
@@ -94,18 +96,14 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="uLogin.pas">
-            <Form>frmLogin</Form>
-        </DCCReference>
-        <DCCReference Include="uMain.pas">
-            <Form>frmMain</Form>
-        </DCCReference>
-        <DCCReference Include="uAddItem.pas">
-            <Form>frmAddItem</Form>
-        </DCCReference>
+        <DCCReference Include="uLogin.pas"/>
+        <DCCReference Include="uMain.pas"/>
+        <DCCReference Include="uAddItem.pas"/>
         <DCCReference Include="uDatabase.pas"/>
         <DCCReference Include="uReceipt.pas"/>
         <DCCReference Include="uArabicTexts.pas"/>
+        <DCCReference Include="uCart.pas"/>
+        <DCCReference Include="uCartForm.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

@@ -16,7 +16,6 @@ object frmLogin: TfrmLogin
   ParentBiDiMode = False
   Position = poScreenCenter
   OnCreate = FormCreate
-  OnClose = FormClose
   TextHeight = 16
   object pnlMain: TPanel
     Left = 0
