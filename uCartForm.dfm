@@ -30,10 +30,10 @@ object frmCart: TfrmCart
     ParentBackground = False
     TabOrder = 0
     object lblTitle: TLabel
-      Left = 20
+      Left = 107
       Top = 10
-      Width = 300
-      Height = 25
+      Width = 213
+      Height = 22
       Caption = #1575#1604#1608#1575'renkorb - '#1575#1604#1593#1606#1575#1589#1585' '#1575#1604#1605#1582#1578#1575#1585#1577
       Font.Charset = ARABIC_CHARSET
       Font.Color = 2825216
@@ -43,10 +43,10 @@ object frmCart: TfrmCart
       ParentFont = False
     end
     object lblSummary: TLabel
-      Left = 20
+      Left = 277
       Top = 45
-      Width = 400
-      Height = 20
+      Width = 143
+      Height = 16
       Caption = #1575#1604#1605#1580#1605#1608#1593': 0 '#1593#1606#1589#1585' - 0.00 '#1580#1606#1610#1607
       Font.Charset = ARABIC_CHARSET
       Font.Color = 1402240
@@ -63,15 +63,15 @@ object frmCart: TfrmCart
     Height = 300
     Align = alClient
     BevelOuter = bvNone
-    Color = 16119285
+    Color = clWhitesmoke
     ParentBackground = False
     TabOrder = 1
     object StringGrid1: TStringGrid
       AlignWithMargins = True
-      Left = 10
-      Top = 10
-      Width = 680
-      Height = 280
+      Left = 3
+      Top = 3
+      Width = 694
+      Height = 294
       Align = alClient
       BiDiMode = bdRightToLeft
       ColCount = 6
@@ -120,10 +120,10 @@ object frmCart: TfrmCart
       ParentBackground = False
       TabOrder = 0
       object lblNewQty: TLabel
-        Left = 20
+        Left = 46
         Top = 15
-        Width = 80
-        Height = 20
+        Width = 54
+        Height = 16
         Caption = #1578#1593#1583#1610#1604' '#1575#1604#1603#1605#1610#1577':'
         Font.Charset = ARABIC_CHARSET
         Font.Color = clWindowText
@@ -131,22 +131,6 @@ object frmCart: TfrmCart
         Font.Name = 'Arial'
         Font.Style = []
         ParentFont = False
-      end
-      object edtNewQty: TEdit
-        Left = 110
-        Top = 12
-        Width = 80
-        Height = 25
-        BiDiMode = bdRightToLeft
-        Font.Charset = ARABIC_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -13
-        Font.Name = 'Arial'
-        Font.Style = []
-        ParentBiDiMode = False
-        ParentFont = False
-        TabOrder = 0
-        OnKeyPress = edtNewQtyKeyPress
       end
       object btnUpdateQty: TSpeedButton
         Left = 200
@@ -177,6 +161,22 @@ object frmCart: TfrmCart
         Font.Style = []
         ParentFont = False
         OnClick = btnRemoveItemClick
+      end
+      object edtNewQty: TEdit
+        Left = 110
+        Top = 12
+        Width = 80
+        Height = 24
+        BiDiMode = bdRightToLeft
+        Font.Charset = ARABIC_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -13
+        Font.Name = 'Arial'
+        Font.Style = []
+        ParentBiDiMode = False
+        ParentFont = False
+        TabOrder = 0
+        OnKeyPress = edtNewQtyKeyPress
       end
     end
     object pnlButtons: TPanel

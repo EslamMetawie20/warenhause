@@ -15,6 +15,7 @@ object frmAddItem: TfrmAddItem
   ParentBiDiMode = False
   Position = poMainFormCenter
   OnCreate = FormCreate
+  OnShow = FormShow
   TextHeight = 16
   object pnlMain: TPanel
     Left = 0

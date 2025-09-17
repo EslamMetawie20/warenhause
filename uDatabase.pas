@@ -22,6 +22,7 @@ type
     FNextID: Integer;
     procedure LoadData;
     procedure SaveData;
+    procedure CleanupZeroQuantityItems;
     function GenerateNextID: string;
   public
     constructor Create;
@@ -55,6 +56,7 @@ begin
   FItems := TList.Create;
   FNextID := 1;
   LoadData;
+  CleanupZeroQuantityItems;
 end;
 
 destructor TDatabaseManager.Destroy;
@@ -73,7 +75,7 @@ var
   FileStream: TFileStream;
   Reader: TBinaryReader;
   Item: PSparePartItem;
-  Count, I: Integer;
+  Count, I, MaxID: Integer;
 begin
   if not FileExists(FDataFile) then
   begin
@@ -88,6 +90,8 @@ begin
     try
       FNextID := Reader.ReadInteger;
       Count := Reader.ReadInteger;
+      MaxID := 0;
+
       for I := 0 to Count - 1 do
       begin
         New(Item);
@@ -97,7 +101,16 @@ begin
         Item^.Location := Reader.ReadString;
         Item^.Price := Reader.ReadDouble;
         FItems.Add(Item);
+
+        // تتبع أعلى رقم ID
+        if StrToIntDef(Item^.ItemID, 0) > MaxID then
+          MaxID := StrToIntDef(Item^.ItemID, 0);
       end;
+
+      // التأكد من أن NextID أكبر من أعلى ID موجود
+      if MaxID >= FNextID then
+        FNextID := MaxID + 1;
+
     finally
       Reader.Free;
       FileStream.Free;
@@ -176,6 +189,12 @@ begin
       if Item^.Quantity >= Quantity then
       begin
         Item^.Quantity := Item^.Quantity - Quantity;
+        // إذا وصلت الكمية إلى صفر، احذف العنصر من قاعدة البيانات
+        if Item^.Quantity = 0 then
+        begin
+          Dispose(Item);
+          FItems.Delete(I);
+        end;
         SaveData;
         Result := True;
       end;
@@ -225,6 +244,46 @@ begin
     AvailableQty := Item.Quantity;
     Price := Item.Price;
   end;
+end;
+
+procedure TDatabaseManager.CleanupZeroQuantityItems;
+var
+  I, MaxID: Integer;
+  Item: PSparePartItem;
+  NeedsSave: Boolean;
+begin
+  NeedsSave := False;
+  I := 0;
+  while I < FItems.Count do
+  begin
+    Item := PSparePartItem(FItems[I]);
+    if Item^.Quantity <= 0 then
+    begin
+      Dispose(Item);
+      FItems.Delete(I);
+      NeedsSave := True;
+    end
+    else
+      Inc(I);
+  end;
+
+  // إعادة حساب NextID بناء على أعلى رقم موجود
+  if FItems.Count > 0 then
+  begin
+    MaxID := 0;
+    for I := 0 to FItems.Count - 1 do
+    begin
+      Item := PSparePartItem(FItems[I]);
+      if StrToIntDef(Item^.ItemID, 0) > MaxID then
+        MaxID := StrToIntDef(Item^.ItemID, 0);
+    end;
+    FNextID := MaxID + 1;
+  end
+  else
+    FNextID := 1;
+
+  if NeedsSave then
+    SaveData;
 end;
 
 function TDatabaseManager.GetAllItems: TList;

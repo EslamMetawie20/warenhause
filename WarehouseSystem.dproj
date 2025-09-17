@@ -101,8 +101,6 @@
         <DCCReference Include="uAddItem.pas"/>
         <DCCReference Include="uDatabase.pas"/>
         <DCCReference Include="uReceipt.pas"/>
-        <DCCReference Include="uSimpleReceipt.pas"/>
-        <DCCReference Include="uPDFReceipt.pas"/>
         <DCCReference Include="uArabicTexts.pas"/>
         <DCCReference Include="uCart.pas"/>
         <DCCReference Include="uCartForm.pas"/>
