@@ -250,7 +250,7 @@ begin
 
   if IsEmpty then
   begin
-    ErrorMessage := 'الواrenkorb فارغ';
+    ErrorMessage := 'السلة  فارغ';
     Result := False;
     Exit;
   end;

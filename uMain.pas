@@ -71,6 +71,7 @@ type
     procedure btnSearchClick(Sender: TObject);
     procedure btnShowAllClick(Sender: TObject);
     procedure edtSearchIDKeyPress(Sender: TObject; var Key: Char);
+    procedure edtWithdrawQtyKeyPress(Sender: TObject; var Key: Char);
     procedure btnAddToCartClick(Sender: TObject);
     procedure btnViewCartClick(Sender: TObject);
     procedure btnClearCartClick(Sender: TObject);
@@ -311,6 +312,7 @@ begin
   edtWithdrawQty.Width := 180;
   edtWithdrawQty.Height := 25;
   edtWithdrawQty.BiDiMode := bdRightToLeft;
+  edtWithdrawQty.OnKeyPress := edtWithdrawQtyKeyPress;
 
   btnAddToCart.Parent := pnlWithdrawSection;
   btnAddToCart.Caption := 'إضافة  السلة';
@@ -339,7 +341,7 @@ begin
   lblCartStatus.Font.Style := [fsBold];
 
   btnViewCart.Parent := pnlCartSection;
-  btnViewCart.Caption := 'عرض ا لسلة ';
+  btnViewCart.Caption := 'عرض السلة ';
   btnViewCart.Left := 20;
   btnViewCart.Top := 70;
   btnViewCart.Width := 130;
@@ -550,6 +552,16 @@ begin
   if Key = #13 then
   begin
     btnSearchClick(Sender);
+    Key := #0;
+  end;
+end;
+
+procedure TfrmMain.edtWithdrawQtyKeyPress(Sender: TObject; var Key: Char);
+begin
+  if Key = #13 then
+  begin
+    if btnAddToCart.Enabled then
+      btnAddToCartClick(Sender);
     Key := #0;
   end;
 end;

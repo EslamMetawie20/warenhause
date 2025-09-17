@@ -197,7 +197,7 @@ begin
   btnCheckout.Font.Style := [fsBold];
 
   btnClear.Parent := pnlButtons;
-  btnClear.Caption := 'إفراغ الواrenkorb';
+  btnClear.Caption := 'إفراغ السلة';
   btnClear.Left := 150;
   btnClear.Top := 15;
   btnClear.Width := 120;
