@@ -318,6 +318,7 @@ begin
   btnAddToCart.Top := 68;
   btnAddToCart.Width := 80;
   btnAddToCart.Height := 29;
+  btnAddToCart.Enabled := False;  // تعطيل الزر افتراضياً
 
   // Cart Section
   pnlCartSection.Parent := pnlSidebar;
@@ -522,11 +523,13 @@ begin
 
     UpdateStatus(GetArabicText('MSG_ITEM_FOUND'));
     UpdateRecordCount;
+    btnAddToCart.Enabled := True;  // تفعيل الزر عند العثور على القطعة
     edtWithdrawQty.SetFocus;
   end
   else
   begin
     UpdateStatus(GetArabicText('MSG_ITEM_NOT_FOUND'));
+    btnAddToCart.Enabled := False;  // تعطيل الزر عند عدم العثور على القطعة
     ShowArabicMessage(GetArabicText('MSG_ITEM_NOT_FOUND'),
       GetArabicText('SYSTEM_TITLE'), mtInformation, [mbOK]);
   end;
@@ -539,6 +542,7 @@ begin
   FCurrentItemID := '';
   edtSearchID.Clear;
   edtWithdrawQty.Clear;
+  btnAddToCart.Enabled := False;  // تعطيل الزر عند عرض جميع القطع
 end;
 
 procedure TfrmMain.edtSearchIDKeyPress(Sender: TObject; var Key: Char);
