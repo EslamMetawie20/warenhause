@@ -121,9 +121,9 @@ begin
     begin
       MessageDlg('تم حفظ القطعة بنجاح برقم: ' + NewItemID,
                  mtInformation, [mbOK], 0);
-      ClearFields;
-      if Assigned(edtItemName) then
-        edtItemName.SetFocus;
+      // إغلاق النافذة بعد الحفظ الناجح
+      ModalResult := mrOk;
+      Close;
     end
     else
     begin

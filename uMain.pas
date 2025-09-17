@@ -65,6 +65,7 @@ type
     mnuRefresh: TMenuItem;
     mnuHelp: TMenuItem;
     mnuAbout: TMenuItem;
+    mnuAboutUs: TMenuItem;
 
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -79,6 +80,7 @@ type
     procedure btnPrintReceiptClick(Sender: TObject);
     procedure mnuExitClick(Sender: TObject);
     procedure mnuAboutClick(Sender: TObject);
+    procedure mnuAboutUsClick(Sender: TObject);
     procedure mnuRefreshClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormResize(Sender: TObject);
@@ -133,6 +135,7 @@ begin
   mnuRefresh.Caption := 'تحديث';
   mnuHelp.Caption := GetArabicText('MENU_HELP');
   mnuAbout.Caption := GetArabicText('MENU_ABOUT');
+  mnuAboutUs.Caption := 'About Us';
 
   // Cart Event Setup
   CartManager.OnCartChanged := OnCartChanged;
@@ -685,11 +688,134 @@ begin
 end;
 
 procedure TfrmMain.mnuAboutClick(Sender: TObject);
+var
+  AboutForm: TForm;
+  RichEdit: TRichEdit;
+  OKButton: TButton;
 begin
-  ShowArabicMessage(GetArabicText('ABOUT_TEXT'),
-    GetArabicText('SYSTEM_TITLE'), mtInformation, [mbOK]);
-end;
+  AboutForm := TForm.Create(nil);
+  try
+    // إعداد النموذج
+    AboutForm.Caption := 'حول النظام';
+    AboutForm.Width := 400;
+    AboutForm.Height := 200;
+    AboutForm.Position := poScreenCenter;
+    AboutForm.BorderStyle := bsDialog;
+    AboutForm.BiDiMode := bdRightToLeft;
+    AboutForm.Font.Name := 'Tahoma';
+    AboutForm.Font.Charset := ARABIC_CHARSET;
 
+    // إنشاء RichEdit لعرض النص
+    RichEdit := TRichEdit.Create(AboutForm);
+    RichEdit.Parent := AboutForm;
+    RichEdit.Left := 15;
+    RichEdit.Top := 15;
+    RichEdit.Width := AboutForm.ClientWidth - 30;
+    RichEdit.Height := AboutForm.ClientHeight - 70;
+    RichEdit.ReadOnly := True;
+    RichEdit.ScrollBars := ssNone;
+    RichEdit.Alignment := taCenter;
+    RichEdit.BiDiMode := bdRightToLeft;
+    RichEdit.Font.Name := 'Tahoma';
+    RichEdit.Font.Size := 12;
+    RichEdit.Font.Charset := ARABIC_CHARSET;
+    RichEdit.Color := clWhite;
+    RichEdit.BorderStyle := bsNone;
+    RichEdit.HideSelection := True; // إخفاء التحديد
+    RichEdit.TabStop := False;
+
+    // النص البسيط
+    RichEdit.Clear;
+    RichEdit.SelAttributes.Style := [fsBold];
+    RichEdit.Lines.Add('');
+    RichEdit.Lines.Add('نظام صرف قطع الغيار');
+    RichEdit.Lines.Add('الخاصة بالجيش المصري');
+
+    // إنشاء زر موافق
+    OKButton := TButton.Create(AboutForm);
+    OKButton.Parent := AboutForm;
+    OKButton.Caption := 'موافق';
+    OKButton.Width := 80;
+    OKButton.Height := 30;
+    OKButton.Left := (AboutForm.ClientWidth - OKButton.Width) div 2;
+    OKButton.Top := AboutForm.ClientHeight - 45;
+    OKButton.ModalResult := mrOK;
+    OKButton.Default := True;
+    OKButton.Font.Name := 'Tahoma';
+    OKButton.Font.Charset := ARABIC_CHARSET;
+
+    // عرض النموذج
+    AboutForm.ShowModal;
+  finally
+    AboutForm.Free;
+  end;
+end;
+procedure TfrmMain.mnuAboutUsClick(Sender: TObject);
+var
+  AboutForm: TForm;
+  RichEdit: TRichEdit;
+  OKButton: TButton;
+begin
+  AboutForm := TForm.Create(nil);
+  try
+    // إعداد النموذج
+    AboutForm.Caption := 'About Us';
+    AboutForm.Width := 400;
+    AboutForm.Height := 250;
+    AboutForm.Position := poScreenCenter;
+    AboutForm.BorderStyle := bsDialog;
+    AboutForm.Font.Name := 'Tahoma';
+
+    // إنشاء RichEdit لعرض النص
+    RichEdit := TRichEdit.Create(AboutForm);
+    RichEdit.Parent := AboutForm;
+    RichEdit.Left := 15;
+    RichEdit.Top := 15;
+    RichEdit.Width := AboutForm.ClientWidth - 30;
+    RichEdit.Height := AboutForm.ClientHeight - 70;
+    RichEdit.ReadOnly := True;
+    RichEdit.ScrollBars := ssNone;
+    RichEdit.Alignment := taCenter;
+    RichEdit.Font.Name := 'Tahoma';
+    RichEdit.Font.Size := 11;
+    RichEdit.Color := clWhite;
+    RichEdit.BorderStyle := bsNone;
+    RichEdit.HideSelection := True;
+    RichEdit.TabStop := False;
+
+    // النص البسيط
+    RichEdit.Clear;
+    RichEdit.Lines.Add('');
+    RichEdit.SelAttributes.Style := [fsBold];
+    RichEdit.SelAttributes.Size := 12;
+    RichEdit.Lines.Add('Developer:');
+    RichEdit.SelAttributes.Style := [];
+    RichEdit.SelAttributes.Size := 11;
+    RichEdit.Lines.Add('Eslam Metawie');
+    RichEdit.Lines.Add('Software Engineer');
+    RichEdit.Lines.Add('');
+    RichEdit.Lines.Add('eslammetawie50@gmail.com');
+    RichEdit.Lines.Add('');
+    RichEdit.SelAttributes.Style := [fsBold];
+
+    // إنشاء زر موافق
+    OKButton := TButton.Create(AboutForm);
+    OKButton.Parent := AboutForm;
+    OKButton.Caption := 'OK';
+    OKButton.Width := 80;
+    OKButton.Height := 30;
+    OKButton.Left := (AboutForm.ClientWidth - OKButton.Width) div 2;
+    OKButton.Top := AboutForm.ClientHeight - 45;
+    OKButton.ModalResult := mrOK;
+    OKButton.Default := True;
+    OKButton.Font.Name := 'Tahoma';
+
+    // عرض النموذج
+    AboutForm.ShowModal;
+  finally
+    AboutForm.Free;
+  end;
+end;
 procedure TfrmMain.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   if ShowArabicMessage(GetArabicText('MSG_EXIT_CONFIRM'),

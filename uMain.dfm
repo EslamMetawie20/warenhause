@@ -473,6 +473,10 @@ object frmMain: TfrmMain
         Caption = #1581#1608#1604' '#1575#1604#1576#1585#1606#1575#1605#1580
         OnClick = mnuAboutClick
       end
+      object mnuAboutUs: TMenuItem
+        Caption = 'About Us'
+        OnClick = mnuAboutUsClick
+      end
     end
   end
 end

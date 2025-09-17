@@ -365,8 +365,8 @@ begin
       CartManager.ClearCart;
 
       // Erfolg anzeigen
-      ShowArabicMessage('تم السحب بنجاح!'#13#10'تم حفظ إيصال PDF في:'#13#10 + ExtractFileName(ReceiptPath),
-        'نجح', mtInformation, [mbOK]);
+      MessageDlg('تم السحب بنجاح', mtInformation, [mbOK], 0);
+
 
       // Form schließen
       ModalResult := mrOk;
