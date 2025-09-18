@@ -15,22 +15,25 @@ type
 implementation
 
 uses
-  Vcl.Imaging.pngimage, Vcl.Graphics, Vcl.Forms;
+  Vcl.Imaging.pngimage, Vcl.Graphics, Vcl.Forms, SynPdf;
 
 { TPDFReceiptGenerator }
 
 class function TPDFReceiptGenerator.GenerateReceiptPDF(
   CartItems: TList<TCartItem>; const OutputPath: string): Boolean;
 var
-  PDFContent: TStringList;
+  PDF: TPdfDocument;
+  Page: TPdfPage;
   I: Integer;
   CartItem: TCartItem;
   TotalValue: Currency;
   TotalItems: Integer;
   ReceiptNo: string;
+  YPos: Double;
+  ItemText: WideString;
 begin
   Result := False;
-  PDFContent := TStringList.Create;
+
   try
     // Calculate totals
     TotalValue := 0;
@@ -44,124 +47,108 @@ begin
 
     ReceiptNo := FormatDateTime('yyyymmddhhnnss', Now);
 
-    // Generate PDF content
-    PDFContent.Add('%PDF-1.4');
-    PDFContent.Add('1 0 obj');
-    PDFContent.Add('<<');
-    PDFContent.Add('/Type /Catalog');
-    PDFContent.Add('/Pages 2 0 R');
-    PDFContent.Add('>>');
-    PDFContent.Add('endobj');
-    PDFContent.Add('');
-    PDFContent.Add('2 0 obj');
-    PDFContent.Add('<<');
-    PDFContent.Add('/Type /Pages');
-    PDFContent.Add('/Kids [3 0 R]');
-    PDFContent.Add('/Count 1');
-    PDFContent.Add('>>');
-    PDFContent.Add('endobj');
-    PDFContent.Add('');
-    PDFContent.Add('3 0 obj');
-    PDFContent.Add('<<');
-    PDFContent.Add('/Type /Page');
-    PDFContent.Add('/Parent 2 0 R');
-    PDFContent.Add('/MediaBox [0 0 612 792]');
-    PDFContent.Add('/Contents 4 0 R');
-    PDFContent.Add('/Resources <<');
-    PDFContent.Add('/Font <<');
-    PDFContent.Add('/F1 5 0 R');
-    PDFContent.Add('>>');
-    PDFContent.Add('>>');
-    PDFContent.Add('>>');
-    PDFContent.Add('endobj');
-    PDFContent.Add('');
-    PDFContent.Add('4 0 obj');
-    PDFContent.Add('<<');
-    PDFContent.Add('/Length 6 0 R');
-    PDFContent.Add('>>');
-    PDFContent.Add('stream');
-    PDFContent.Add('BT');
-    PDFContent.Add('/F1 18 Tf');
-    PDFContent.Add('50 750 Td');
-    PDFContent.Add('(القوات المسلحة المصرية) Tj');
-    PDFContent.Add('0 -25 Td');
-    PDFContent.Add('/F1 16 Tf');
-    PDFContent.Add('(إيصال سحب قطع غيار) Tj');
-    PDFContent.Add('0 -40 Td');
-    PDFContent.Add('/F1 12 Tf');
-    PDFContent.Add('(رقم الإيصال: ' + ReceiptNo + ') Tj');
-    PDFContent.Add('0 -20 Td');
-    PDFContent.Add('(التاريخ: ' + DateToStr(Now) + ') Tj');
-    PDFContent.Add('0 -20 Td');
-    PDFContent.Add('(الوقت: ' + TimeToStr(Now) + ') Tj');
-    PDFContent.Add('0 -40 Td');
-    PDFContent.Add('/F1 14 Tf');
-    PDFContent.Add('(تفاصيل القطع المسحوبة:) Tj');
-    PDFContent.Add('0 -30 Td');
-    PDFContent.Add('/F1 10 Tf');
+    // Create PDF document
+    PDF := TPdfDocument.Create;
+    try
+      // Add page
+      Page := PDF.AddPage;
 
-    // Add items
-    for I := 0 to CartItems.Count - 1 do
-    begin
-      CartItem := CartItems[I];
-      PDFContent.Add('(' + CartItem.ItemID + ' - ' + CartItem.ItemName + ' - كمية: ' +
-                     IntToStr(CartItem.RequestedQty) + ' - سعر: ' +
-                     FormatFloat('0.00', CartItem.TotalPrice) + ' جنيه) Tj');
-      PDFContent.Add('0 -15 Td');
+      // Set initial Y position (from top)
+      YPos := 750;
+
+      // Header - Egyptian Armed Forces
+      Page.Canvas.SetFont('Arial-Unicode', 18);
+      Page.Canvas.TextOutW(250, YPos, WideString('القوات المسلحة المصرية'));
+
+      YPos := YPos - 30;
+      Page.Canvas.SetFont('Arial-Unicode', 16);
+      Page.Canvas.TextOutW(230, YPos, WideString('إيصال سحب قطع غيار'));
+
+      // Receipt Information
+      YPos := YPos - 40;
+      Page.Canvas.SetFont('Arial-Unicode', 12);
+      Page.Canvas.TextOutW(400, YPos, WideString('رقم الإيصال: ' + ReceiptNo));
+
+      YPos := YPos - 25;
+      Page.Canvas.TextOutW(400, YPos, WideString('التاريخ: ' + DateToStr(Now)));
+
+      YPos := YPos - 25;
+      Page.Canvas.TextOutW(400, YPos, WideString('الوقت: ' + TimeToStr(Now)));
+
+      // Section Header
+      YPos := YPos - 40;
+      Page.Canvas.SetFont('Arial-Unicode', 14);
+      Page.Canvas.TextOutW(400, YPos, WideString('تفاصيل القطع المسحوبة:'));
+
+      // Draw table header line
+      YPos := YPos - 10;
+      Page.Canvas.MoveToPoint(50, YPos);
+      Page.Canvas.DrawLine(550, YPos);
+
+      // Items Details
+      YPos := YPos - 30;
+      Page.Canvas.SetFont('Arial-Unicode', 11);
+
+      for I := 0 to CartItems.Count - 1 do
+      begin
+        CartItem := CartItems[I];
+
+        // Create item text with all details
+        ItemText := WideString(Format('%s - %s', [CartItem.ItemID, CartItem.ItemName]));
+        Page.Canvas.TextOutW(350, YPos, ItemText);
+
+        ItemText := WideString(Format('الكمية: %d - السعر: %.2f جنيه',
+          [CartItem.RequestedQty, CartItem.TotalPrice]));
+        Page.Canvas.TextOutW(350, YPos - 15, ItemText);
+
+        ItemText := WideString(Format('المكان: %s', [CartItem.Location]));
+        Page.Canvas.TextOutW(350, YPos - 30, ItemText);
+
+        YPos := YPos - 50;
+
+        // Add separator line
+        Page.Canvas.MoveToPoint(100, YPos + 10);
+        Page.Canvas.DrawLine(500, YPos + 10);
+      end;
+
+      // Summary
+      YPos := YPos - 20;
+      Page.Canvas.SetFont('Arial-Unicode', 12);
+      Page.Canvas.TextOutW(350, YPos, WideString('عدد الأصناف: ' + IntToStr(CartItems.Count)));
+
+      YPos := YPos - 25;
+      Page.Canvas.TextOutW(350, YPos, WideString('إجمالي القطع: ' + IntToStr(TotalItems)));
+
+      YPos := YPos - 25;
+      Page.Canvas.SetFont('Arial-Unicode', 14);
+      Page.Canvas.TextOutW(350, YPos, WideString('القيمة الإجمالية: ' +
+        FormatFloat('#,##0.00', TotalValue) + ' جنيه'));
+
+      // Signatures
+      YPos := YPos - 50;
+      Page.Canvas.SetFont('Arial-Unicode', 12);
+      Page.Canvas.TextOutW(400, YPos, WideString('توقيع المستلم: ___________________'));
+
+      YPos := YPos - 35;
+      Page.Canvas.TextOutW(400, YPos, WideString('توقيع أمين المخزن: ___________________'));
+
+      // Footer
+      YPos := 50;
+      Page.Canvas.SetFont('Arial-Unicode', 10);
+      Page.Canvas.TextOutW(200, YPos, WideString('© 2025 القوات المسلحة المصرية'));
+
+      // Save PDF
+      PDF.SaveToFile(ChangeFileExt(OutputPath, '.pdf'));
+      Result := True;
+    finally
+      PDF.Free;
     end;
-
-    PDFContent.Add('0 -20 Td');
-    PDFContent.Add('/F1 12 Tf');
-    PDFContent.Add('(عدد الأصناف: ' + IntToStr(CartItems.Count) + ') Tj');
-    PDFContent.Add('0 -20 Td');
-    PDFContent.Add('(إجمالي القطع: ' + IntToStr(TotalItems) + ') Tj');
-    PDFContent.Add('0 -20 Td');
-    PDFContent.Add('(القيمة الإجمالية: ' + FormatFloat('#,##0.00', TotalValue) + ' جنيه) Tj');
-    PDFContent.Add('0 -40 Td');
-    PDFContent.Add('(توقيع المستلم: ___________________) Tj');
-    PDFContent.Add('0 -30 Td');
-    PDFContent.Add('(توقيع أمين المخزن: ___________________) Tj');
-    PDFContent.Add('0 -40 Td');
-    PDFContent.Add('(© 2025 القوات المسلحة المصرية) Tj');
-    PDFContent.Add('ET');
-    PDFContent.Add('endstream');
-    PDFContent.Add('endobj');
-    PDFContent.Add('');
-    PDFContent.Add('5 0 obj');
-    PDFContent.Add('<<');
-    PDFContent.Add('/Type /Font');
-    PDFContent.Add('/Subtype /Type1');
-    PDFContent.Add('/BaseFont /Helvetica');
-    PDFContent.Add('>>');
-    PDFContent.Add('endobj');
-    PDFContent.Add('');
-    PDFContent.Add('6 0 obj');
-    PDFContent.Add('1200');
-    PDFContent.Add('endobj');
-    PDFContent.Add('');
-    PDFContent.Add('xref');
-    PDFContent.Add('0 7');
-    PDFContent.Add('0000000000 65535 f ');
-    PDFContent.Add('0000000009 00000 n ');
-    PDFContent.Add('0000000074 00000 n ');
-    PDFContent.Add('0000000120 00000 n ');
-    PDFContent.Add('0000000179 00000 n ');
-    PDFContent.Add('0000000364 00000 n ');
-    PDFContent.Add('0000000466 00000 n ');
-    PDFContent.Add('trailer');
-    PDFContent.Add('<<');
-    PDFContent.Add('/Size 7');
-    PDFContent.Add('/Root 1 0 R');
-    PDFContent.Add('>>');
-    PDFContent.Add('startxref');
-    PDFContent.Add('484');
-    PDFContent.Add('%%EOF');
-
-    // Save as PDF
-    PDFContent.SaveToFile(ChangeFileExt(OutputPath, '.pdf'), TEncoding.UTF8);
-    Result := True;
-  finally
-    PDFContent.Free;
+  except
+    on E: Exception do
+    begin
+      // Fall back to simple receipt if PDF fails
+      Result := False;
+    end;
   end;
 end;
 
