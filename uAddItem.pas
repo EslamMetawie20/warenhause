@@ -28,12 +28,15 @@ type
     procedure edtPriceKeyPress(Sender: TObject; var Key: Char);
     procedure FormShow(Sender: TObject);
   private
+    FEditMode: Boolean;
+    FOriginalItemID: string;
     procedure ClearFields;
     procedure SetupForm;
     procedure SetupArabicFont;
     function ValidateInputs: Boolean;
   public
-    { Public declarations }
+    property EditMode: Boolean read FEditMode write FEditMode;
+    property OriginalItemID: string read FOriginalItemID write FOriginalItemID;
   end;
 
 var
@@ -53,10 +56,19 @@ end;
 
 procedure TfrmAddItem.FormShow(Sender: TObject);
 begin
-  // تحديد رقم القطعة عند عرض النموذج
-  ClearFields;
-  if Assigned(edtItemID) then
-    edtItemID.SetFocus;
+  // في وضع الإضافة فقط، امسح الحقول
+  if not FEditMode then
+  begin
+    ClearFields;
+    if Assigned(edtItemID) then
+      edtItemID.SetFocus;
+  end
+  else
+  begin
+    // في وضع التعديل، اجعل التركيز على حقل الاسم
+    if Assigned(edtItemName) then
+      edtItemName.SetFocus;
+  end;
 end;
 
 procedure TfrmAddItem.SetupForm;
@@ -105,32 +117,74 @@ end;
 procedure TfrmAddItem.btnSaveClick(Sender: TObject);
 var
   NewItemID: string;
+  Success: Boolean;
 begin
   if not ValidateInputs then
     Exit;
 
   try
-    // استخدم رقم القطعة المدخل من المستخدم
-    NewItemID := DBManager.AddNewItemWithID(
-      Trim(edtItemID.Text),
-      Trim(edtItemName.Text),
-      Trim(edtLocation.Text),
-      StrToInt(edtQuantity.Text),
-      StrToCurr(edtPrice.Text)
-    );
-
-    if NewItemID <> '' then
+    if FEditMode then
     begin
-      MessageDlg('تم حفظ القطعة بنجاح برقم: ' + NewItemID,
-                 mtInformation, [mbOK], 0);
-      // إغلاق النافذة بعد الحفظ الناجح
-      ModalResult := mrOk;
-      Close;
+      // في وضع التعديل - استخدم طريقة بسيطة
+      if Trim(edtItemID.Text) = FOriginalItemID then
+      begin
+        // ID لم يتغير، حدث البيانات فقط
+        Success := DBManager.UpdateItem(
+          FOriginalItemID,
+          Trim(edtItemName.Text),
+          Trim(edtLocation.Text),
+          StrToInt(edtQuantity.Text),
+          StrToCurr(edtPrice.Text)
+        );
+      end
+      else
+      begin
+        // ID تغير - احذف القديم وأضف جديد
+        Success := DBManager.DeleteItem(FOriginalItemID) and
+                   (DBManager.AddNewItemWithID(
+                     Trim(edtItemID.Text),
+                     Trim(edtItemName.Text),
+                     Trim(edtLocation.Text),
+                     StrToInt(edtQuantity.Text),
+                     StrToCurr(edtPrice.Text)
+                   ) <> '');
+      end;
+
+      if Success then
+      begin
+        MessageDlg('تم تحديث البيانات بنجاح!', mtInformation, [mbOK], 0);
+        ModalResult := mrOk;
+        Close;
+      end
+      else
+      begin
+        MessageDlg('حدث خطأ أثناء تحديث البيانات.',
+                   mtError, [mbOK], 0);
+      end;
     end
     else
     begin
-      MessageDlg('حدث خطأ أثناء حفظ البيانات. يرجى المحاولة مرة أخرى.',
-                 mtError, [mbOK], 0);
+      // في وضع الإضافة، قم بإضافة عنصر جديد
+      NewItemID := DBManager.AddNewItemWithID(
+        Trim(edtItemID.Text),
+        Trim(edtItemName.Text),
+        Trim(edtLocation.Text),
+        StrToInt(edtQuantity.Text),
+        StrToCurr(edtPrice.Text)
+      );
+
+      if NewItemID <> '' then
+      begin
+        MessageDlg('تم حفظ القطعة بنجاح برقم: ' + NewItemID,
+                   mtInformation, [mbOK], 0);
+        ModalResult := mrOk;
+        Close;
+      end
+      else
+      begin
+        MessageDlg('حدث خطأ أثناء حفظ البيانات. يرجى المحاولة مرة أخرى.',
+                   mtError, [mbOK], 0);
+      end;
     end;
   except
     on E: Exception do
@@ -162,15 +216,33 @@ begin
   end;
 
   // التحقق من وجود رقم القطعة مسبقاً
-  if DBManager.ItemIDExists(Trim(edtItemID.Text)) then
+  if FEditMode then
   begin
-    MessageDlg('رقم القطعة موجود بالفعل! من فضلك استخدم رقم آخر', mtWarning, [mbOK], 0);
-    if Assigned(edtItemID) then
+    // في وضع التعديل، تحقق فقط إذا تغير ID
+    if (Trim(edtItemID.Text) <> FOriginalItemID) and DBManager.ItemIDExists(Trim(edtItemID.Text)) then
     begin
-      edtItemID.SelectAll;
-      edtItemID.SetFocus;
+      MessageDlg('رقم القطعة موجود بالفعل! من فضلك استخدم رقم آخر', mtWarning, [mbOK], 0);
+      if Assigned(edtItemID) then
+      begin
+        edtItemID.SelectAll;
+        edtItemID.SetFocus;
+      end;
+      Exit;
     end;
-    Exit;
+  end
+  else
+  begin
+    // في وضع الإضافة، تحقق من عدم وجود ID
+    if DBManager.ItemIDExists(Trim(edtItemID.Text)) then
+    begin
+      MessageDlg('رقم القطعة موجود بالفعل! من فضلك استخدم رقم آخر', mtWarning, [mbOK], 0);
+      if Assigned(edtItemID) then
+      begin
+        edtItemID.SelectAll;
+        edtItemID.SetFocus;
+      end;
+      Exit;
+    end;
   end;
 
   // التحقق من اسم القطعة

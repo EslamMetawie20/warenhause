@@ -35,6 +35,9 @@ type
     function AddNewItemWithID(const ItemID, ItemName, Location: string;
       Quantity: Integer; Price: Currency): string;
     function ItemIDExists(const ItemID: string): Boolean;
+    function UpdateItem(const ItemID, ItemName, Location: string;
+      Quantity: Integer; Price: Currency): Boolean;
+    function DeleteItem(const ItemID: string): Boolean;
     function GetItemDetails(const ItemID: string; var ItemName, Location: string;
       var AvailableQty: Integer; var Price: Currency): Boolean;
     function GetAllItems: TList;
@@ -267,6 +270,49 @@ begin
     Item := PSparePartItem(FItems[I]);
     if Item^.ItemID = ItemID then
     begin
+      Result := True;
+      Exit;
+    end;
+  end;
+end;
+
+function TDatabaseManager.UpdateItem(const ItemID, ItemName, Location: string;
+  Quantity: Integer; Price: Currency): Boolean;
+var
+  I: Integer;
+  Item: PSparePartItem;
+begin
+  Result := False;
+  for I := 0 to FItems.Count - 1 do
+  begin
+    Item := PSparePartItem(FItems[I]);
+    if Item^.ItemID = ItemID then
+    begin
+      Item^.ItemName := ItemName;
+      Item^.Location := Location;
+      Item^.Quantity := Quantity;
+      Item^.Price := Price;
+      SaveData;
+      Result := True;
+      Exit;
+    end;
+  end;
+end;
+
+function TDatabaseManager.DeleteItem(const ItemID: string): Boolean;
+var
+  I: Integer;
+  Item: PSparePartItem;
+begin
+  Result := False;
+  for I := 0 to FItems.Count - 1 do
+  begin
+    Item := PSparePartItem(FItems[I]);
+    if Item^.ItemID = ItemID then
+    begin
+      Dispose(Item);
+      FItems.Delete(I);
+      SaveData;
       Result := True;
       Exit;
     end;

@@ -67,6 +67,11 @@ type
     mnuAbout: TMenuItem;
     mnuAboutUs: TMenuItem;
 
+    // Popup Menu für Rechtsklick
+    PopupMenu1: TPopupMenu;
+    mnuEdit: TMenuItem;
+    mnuDelete: TMenuItem;
+
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure btnSearchClick(Sender: TObject);
@@ -87,13 +92,19 @@ type
     procedure tmrClockTimer(Sender: TObject);
     procedure StringGrid1DrawCell(Sender: TObject; ACol, ARow: Integer;
       Rect: TRect; State: TGridDrawState);
+    procedure StringGrid1DblClick(Sender: TObject);
+    procedure StringGrid1SelectCell(Sender: TObject; ACol, ARow: Integer;
+      var CanSelect: Boolean);
   private
     FCurrentItemID: string;
     FLastWithdrawDetails: string;
+    FSelectedRow: Integer;
+    procedure PopupMenuItemClick(Sender: TObject);
     procedure SetupUI;
     procedure SetupSidebarSections;
     procedure SetupColors;
     procedure SetupFonts;
+    procedure SetupPopupMenu;
     procedure UpdateStatus(const Msg: string);
     procedure LoadAllItems;
     procedure UpdateRecordCount;
@@ -126,6 +137,7 @@ begin
   SetupUI;
   SetupColors;
   SetupFonts;
+  SetupPopupMenu;
 
   // Menu Setup
   mnuFile.Caption := GetArabicText('MENU_FILE');
@@ -236,6 +248,7 @@ begin
   StringGrid1.DefaultRowHeight := 35;
   StringGrid1.Options := StringGrid1.Options + [goRowSelect, goThumbTracking];
   StringGrid1.ScrollBars := ssVertical;
+  // PopupMenu wird in SetupPopupMenu zugewiesen
 
   // Grid Headers
   StringGrid1.Cells[0, 0] := 'رقم القطعة';
@@ -1015,6 +1028,178 @@ begin
     Result := MsgForm.ShowModal;
   finally
     MsgForm.Free;
+  end;
+end;
+
+procedure TfrmMain.SetupPopupMenu;
+begin
+  // Events verknüpfen
+  if Assigned(StringGrid1) then
+  begin
+    StringGrid1.OnDblClick := StringGrid1DblClick;
+    StringGrid1.OnSelectCell := StringGrid1SelectCell;
+  end;
+end;
+
+procedure TfrmMain.StringGrid1DblClick(Sender: TObject);
+var
+  ItemID: string;
+  PopupMenu: TPopupMenu;
+  MenuItem1, MenuItem2: TMenuItem;
+  ClickPoint: TPoint;
+begin
+  if (StringGrid1.Row > 0) and (StringGrid1.Row < StringGrid1.RowCount) then
+  begin
+    ItemID := StringGrid1.Cells[0, StringGrid1.Row];
+
+    if ItemID <> '' then
+    begin
+      // إنشاء قائمة منبثقة
+      PopupMenu := TPopupMenu.Create(nil);
+      try
+        PopupMenu.BiDiMode := bdRightToLeft;
+
+        // إضافة خيار التعديل
+        MenuItem1 := TMenuItem.Create(PopupMenu);
+        MenuItem1.Caption := 'تعديل';
+        MenuItem1.Tag := 1;
+        MenuItem1.OnClick := PopupMenuItemClick;
+        PopupMenu.Items.Add(MenuItem1);
+
+        // إضافة خيار الحذف
+        MenuItem2 := TMenuItem.Create(PopupMenu);
+        MenuItem2.Caption := 'حذف';
+        MenuItem2.Tag := 2;
+        MenuItem2.OnClick := PopupMenuItemClick;
+        PopupMenu.Items.Add(MenuItem2);
+
+        // حفظ الصف المحدد
+        FSelectedRow := StringGrid1.Row;
+
+        // عرض القائمة
+        GetCursorPos(ClickPoint);
+        PopupMenu.Popup(ClickPoint.X, ClickPoint.Y);
+
+        // انتظار حتى يتم إغلاق القائمة
+        Application.ProcessMessages;
+      finally
+        PopupMenu.Free;
+      end;
+    end;
+  end;
+end;
+
+procedure TfrmMain.PopupMenuItemClick(Sender: TObject);
+var
+  ItemID, ItemName, Location: string;
+  Quantity: Integer;
+  Price: Currency;
+  frmEdit: TfrmAddItem;
+begin
+  if (FSelectedRow > 0) and (FSelectedRow < StringGrid1.RowCount) then
+  begin
+    ItemID := StringGrid1.Cells[0, FSelectedRow];
+
+    if ItemID <> '' then
+    begin
+      case TMenuItem(Sender).Tag of
+        1: // تعديل
+        begin
+          ItemName := StringGrid1.Cells[1, FSelectedRow];
+          Quantity := StrToIntDef(StringGrid1.Cells[2, FSelectedRow], 0);
+          Location := StringGrid1.Cells[3, FSelectedRow];
+          Price := StrToCurrDef(StringGrid1.Cells[4, FSelectedRow], 0);
+
+          frmEdit := TfrmAddItem.Create(nil);
+          try
+            // تعيين وضع التعديل أولاً
+            frmEdit.EditMode := True;
+            frmEdit.OriginalItemID := ItemID;
+            frmEdit.Caption := 'تعديل قطعة - نظام إدارة المخازن';
+
+            // ملء جميع الحقول بالبيانات
+            if Assigned(frmEdit.edtItemID) then
+            begin
+              frmEdit.edtItemID.Text := ItemID;
+              frmEdit.edtItemID.ReadOnly := False;
+              frmEdit.edtItemID.Color := clWindow;
+            end;
+
+            if Assigned(frmEdit.edtItemName) then
+              frmEdit.edtItemName.Text := ItemName;
+
+            if Assigned(frmEdit.edtQuantity) then
+              frmEdit.edtQuantity.Text := IntToStr(Quantity);
+
+            if Assigned(frmEdit.edtLocation) then
+              frmEdit.edtLocation.Text := Location;
+
+            if Assigned(frmEdit.edtPrice) then
+              frmEdit.edtPrice.Text := FormatFloat('0.00', Price);
+
+            if frmEdit.ShowModal = mrOk then
+            begin
+              LoadAllItems;
+              UpdateStatus('تم تعديل القطعة بنجاح');
+            end;
+          finally
+            frmEdit.Free;
+          end;
+        end;
+
+        2: // حذف
+        begin
+          if MessageDlg('هل أنت متأكد من حذف القطعة رقم ' + ItemID + '؟',
+                        mtConfirmation, [mbYes, mbNo], 0) = mrYes then
+          begin
+            if DBManager.DeleteItem(ItemID) then
+            begin
+              LoadAllItems;
+              UpdateStatus('تم حذف القطعة بنجاح');
+            end
+            else
+            begin
+              MessageDlg('حدث خطأ أثناء حذف القطعة', mtError, [mbOK], 0);
+            end;
+          end;
+        end;
+      end;
+    end;
+  end;
+end;
+
+procedure TfrmMain.StringGrid1SelectCell(Sender: TObject; ACol, ARow: Integer;
+  var CanSelect: Boolean);
+begin
+  CanSelect := True;
+
+  // تأكد من أن الصف المحدد يحتوي على بيانات
+  if (ARow > 0) and (ARow < StringGrid1.RowCount) and
+     (StringGrid1.Cells[0, ARow] <> '') then
+  begin
+    // ملء حقل ID
+    if Assigned(edtSearchID) then
+      edtSearchID.Text := StringGrid1.Cells[0, ARow];
+
+    // حفظ ID العنصر الحالي
+    FCurrentItemID := StringGrid1.Cells[0, ARow];
+
+    // يمكنك أيضاً عرض باقي البيانات في شريط الحالة
+    UpdateStatus('العنصر المحدد: ' +
+                 StringGrid1.Cells[1, ARow] + ' - ' +
+                 'الكمية: ' + StringGrid1.Cells[2, ARow] + ' - ' +
+                 'السعر: ' + StringGrid1.Cells[4, ARow] + ' جنيه');
+
+    // تفعيل زر إضافة إلى السلة
+    if Assigned(btnAddToCart) then
+      btnAddToCart.Enabled := True;
+
+    // مسح حقل الكمية ليدخل المستخدم الكمية الجديدة
+    if Assigned(edtWithdrawQty) then
+    begin
+      edtWithdrawQty.Clear;
+      edtWithdrawQty.SetFocus;
+    end;
   end;
 end;
 
