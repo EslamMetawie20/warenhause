@@ -32,6 +32,9 @@ type
     function WithdrawItem(const ItemID: string; Quantity: Integer): Boolean;
     function AddNewItem(const ItemName, Location: string;
       Quantity: Integer; Price: Currency): string;
+    function AddNewItemWithID(const ItemID, ItemName, Location: string;
+      Quantity: Integer; Price: Currency): string;
+    function ItemIDExists(const ItemID: string): Boolean;
     function GetItemDetails(const ItemID: string; var ItemName, Location: string;
       var AvailableQty: Integer; var Price: Currency): Boolean;
     function GetAllItems: TList;
@@ -228,6 +231,46 @@ begin
   FItems.Add(Item);
   SaveData;
   Result := Item^.ItemID;
+end;
+
+function TDatabaseManager.AddNewItemWithID(const ItemID, ItemName, Location: string;
+  Quantity: Integer; Price: Currency): string;
+var
+  Item: PSparePartItem;
+begin
+  // التحقق من وجود الرقم مسبقاً
+  if ItemIDExists(ItemID) then
+  begin
+    Result := '';
+    Exit;
+  end;
+
+  New(Item);
+  Item^.ItemID := ItemID;
+  Item^.ItemName := ItemName;
+  Item^.Location := Location;
+  Item^.Quantity := Quantity;
+  Item^.Price := Price;
+  FItems.Add(Item);
+  SaveData;
+  Result := Item^.ItemID;
+end;
+
+function TDatabaseManager.ItemIDExists(const ItemID: string): Boolean;
+var
+  I: Integer;
+  Item: PSparePartItem;
+begin
+  Result := False;
+  for I := 0 to FItems.Count - 1 do
+  begin
+    Item := PSparePartItem(FItems[I]);
+    if Item^.ItemID = ItemID then
+    begin
+      Result := True;
+      Exit;
+    end;
+  end;
 end;
 
 function TDatabaseManager.GetItemDetails(const ItemID: string; var ItemName, Location: string;

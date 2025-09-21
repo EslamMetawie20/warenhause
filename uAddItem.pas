@@ -53,10 +53,10 @@ end;
 
 procedure TfrmAddItem.FormShow(Sender: TObject);
 begin
-  // تحديث رقم القطعة عند عرض النموذج
+  // تحديد رقم القطعة عند عرض النموذج
   ClearFields;
-  if Assigned(edtItemName) then
-    edtItemName.SetFocus;
+  if Assigned(edtItemID) then
+    edtItemID.SetFocus;
 end;
 
 procedure TfrmAddItem.SetupForm;
@@ -77,12 +77,12 @@ begin
   btnSave.Caption     := 'حفظ';
   btnCancel.Caption   := 'إلغاء';
 
-  // إعداد حقل رقم القطعة
+  // إعداد حقل رقم القطعة للإدخال اليدوي
   if Assigned(edtItemID) then
   begin
-    edtItemID.ReadOnly := True;
-    edtItemID.Color := clBtnFace;
-    edtItemID.TabStop := False;
+    edtItemID.ReadOnly := False;
+    edtItemID.Color := clWindow;
+    edtItemID.TabStop := True;
   end;
 
   // إعداد النص الافتراضي لمكان التخزين
@@ -110,7 +110,9 @@ begin
     Exit;
 
   try
-    NewItemID := DBManager.AddNewItem(
+    // استخدم رقم القطعة المدخل من المستخدم
+    NewItemID := DBManager.AddNewItemWithID(
+      Trim(edtItemID.Text),
       Trim(edtItemName.Text),
       Trim(edtLocation.Text),
       StrToInt(edtQuantity.Text),
@@ -149,6 +151,27 @@ var
   Price: Currency;
 begin
   Result := False;
+
+  // التحقق من رقم القطعة
+  if Trim(edtItemID.Text) = '' then
+  begin
+    MessageDlg('من فضلك أدخل رقم القطعة', mtWarning, [mbOK], 0);
+    if Assigned(edtItemID) then
+      edtItemID.SetFocus;
+    Exit;
+  end;
+
+  // التحقق من وجود رقم القطعة مسبقاً
+  if DBManager.ItemIDExists(Trim(edtItemID.Text)) then
+  begin
+    MessageDlg('رقم القطعة موجود بالفعل! من فضلك استخدم رقم آخر', mtWarning, [mbOK], 0);
+    if Assigned(edtItemID) then
+    begin
+      edtItemID.SelectAll;
+      edtItemID.SetFocus;
+    end;
+    Exit;
+  end;
 
   // التحقق من اسم القطعة
   if Trim(edtItemName.Text) = '' then
@@ -259,15 +282,9 @@ end;
 procedure TfrmAddItem.ClearFields;
 begin
   try
-    // الحصول على الرقم التالي وعرضه
-    if Assigned(DBManager) and Assigned(edtItemID) then
-    begin
-      edtItemID.Text := DBManager.GetNextID;
-      // للتأكد من أن الرقم يظهر
-      edtItemID.Refresh;
-    end
-    else if Assigned(edtItemID) then
-      edtItemID.Text := '1';
+    // مسح حقل رقم القطعة ليدخله المستخدم يدوياً
+    if Assigned(edtItemID) then
+      edtItemID.Clear;
 
     if Assigned(edtItemName) then
       edtItemName.Clear;
